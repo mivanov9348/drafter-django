@@ -1,0 +1,114 @@
+{% extends "core/dashboard.html" %}
+{% load static %}
+
+{% block content %}
+    <style>
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff4500;
+            padding: 15px 30px;
+        }
+
+        .navbar .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-left: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .filters a {
+            text-decoration: none;
+            color: white;
+            background-color: #ff4500;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .filters a:hover {
+            background-color: #d13700;
+        }
+
+        .wrestlers-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .wrestler-card {
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 250px;
+        }
+
+        .wrestler-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .wrestler-card h3 {
+            margin: 10px 0;
+        }
+
+        .wrestler-card p {
+            margin: 5px 0;
+        }
+    </style>
+
+    <div class="filters">
+        <a href="?filter=all">Всички</a>
+        <a href="?filter=high_rating">Най-висок рейтинг</a>
+        <a href="?filter=heavyweight">Тежка категория</a>
+        <a href="?filter=lightweight">Лека категория</a>
+    </div>
+
+    <div class="wrestlers-container">
+        {% for wrestler in wrestlers %}
+        <div class="wrestler-card">
+            {% if wrestler.image %}
+                <img src="{{ wrestler.image.url }}" alt="{{ wrestler.name }}">
+            {% else %}
+                <img src="{% static 'images/default-wrestler.jpg' %}" alt="No Image">
+            {% endif %}
+            <h3>{{ wrestler.name }}</h3>
+            <p>Възраст: {{ wrestler.age }}</p>
+            <p>Тегло: {{ wrestler.weight }} кг</p>
+            <p>Височина: {{ wrestler.height }} см</p>
+            <p>Рейтинг: {{ wrestler.overall_rating }}</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

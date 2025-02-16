@@ -6,6 +6,7 @@ class Wrestler(models.Model):
     weight = models.FloatField()
     height = models.FloatField()
     overall_rating = models.IntegerField()
+    image = models.ImageField(upload_to='wrestlers/', null=True, blank=True)
 
     def __str__(self):
         return self.name

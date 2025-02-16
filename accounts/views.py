@@ -13,6 +13,11 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from .models import CustomUser
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib import messages
+from .models import CustomUser
+
 def register(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -23,15 +28,15 @@ def register(request):
         password2 = request.POST['password2']
 
         if password1 != password2:
-            messages.error(request, "Паролите не съвпадат!")
+            messages.error(request, "Passwords do not match!")
             return redirect('register')
 
         if CustomUser.objects.filter(username=username).exists():
-            messages.error(request, "Това потребителско име вече е заето!")
+            messages.error(request, "This username is already taken!")
             return redirect('register')
 
         if CustomUser.objects.filter(email=email).exists():
-            messages.error(request, "Този имейл вече е регистриран!")
+            messages.error(request, "This email is already registered!")
             return redirect('register')
 
         user = CustomUser.objects.create_user(
@@ -42,6 +47,7 @@ def register(request):
         return redirect('core:dashboard')
 
     return render(request, 'accounts/register.html')
+
 
 def user_login(request):
     if request.method == "POST":

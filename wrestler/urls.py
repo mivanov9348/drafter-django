@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import wrestler_list
+from wrestler.views import all_wrestlers
+
+app_name = 'wrestler'
 
 urlpatterns = [
-    path('', wrestler_list, name='wrestler_list'),
+    path('wrestlers/', all_wrestlers, name='wrestlers'),
 ]
