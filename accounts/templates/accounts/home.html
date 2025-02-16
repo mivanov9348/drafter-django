@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WWE Draft - Home</title>
+</head>
+<body>
+    <h1>Добре дошли в WWE Draft</h1>
+    {% if user.is_authenticated %}
+        <p>Здравей, {{ user.username }}! <a href="{% url 'logout' %}">Изход</a></p>
+    {% else %}
+        <a href="{% url 'login' %}">Вход</a> | <a href="{% url 'register' %}">Регистрация</a>
+    {% endif %}
+</body>
+</html>

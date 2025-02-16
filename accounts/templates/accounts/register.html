@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+</head>
+<body>
+    <h2>Регистрация</h2>
+    {% for message in messages %}
+        <p style="color:red">{{ message }}</p>
+    {% endfor %}
+    <form method="POST">
+        {% csrf_token %}
+        <label>Потребителско име:</label>
+        <input type="text" name="username" required><br>
+
+        <label>Имейл:</label>
+        <input type="email" name="email" required><br>
+
+        <label>Парола:</label>
+        <input type="password" name="password1" required><br>
+
+        <label>Повтори паролата:</label>
+        <input type="password" name="password2" required><br>
+
+        <button type="submit">Регистрация</button>
+    </form>
+    <a href="{% url 'login' %}">Вече имате акаунт? Вход</a>
+</body>
+</html>
