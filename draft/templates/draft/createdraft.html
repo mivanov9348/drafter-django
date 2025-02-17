@@ -1,0 +1,20 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+  <h2>Create New Draft</h2>
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <label for="name">Draft Name:</label>
+      <input type="text" name="name" id="name" value="{{ name|default:'' }}" required>
+    </div>
+    <div>
+      <label for="num_brands">Number of Brands (2-10):</label>
+      <input type="number" name="num_brands" id="num_brands" min="2" max="10" required>
+    </div>
+    <button type="submit">Create</button>
+  </form>
+{% endblock %}

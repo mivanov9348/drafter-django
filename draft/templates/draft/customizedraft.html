@@ -1,0 +1,24 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+  <h2>Customize Draft: {{ draft.name }}</h2>
+  <p>Number of Brands to Participate: {{ num_brands }}</p>
+  <form method="post">
+    {% csrf_token %}
+    <fieldset>
+      <legend>Select Brands</legend>
+      {% for brand in brands %}
+        <input type="checkbox" name="brands" value="{{ brand.id }}" id="brand_{{ brand.id }}">
+        <label for="brand_{{ brand.id }}">{{ brand.brand.name }}</label><br>
+      {% endfor %}
+    </fieldset>
+    <fieldset>
+      <legend>Select Wrestlers</legend>
+      {% for wrestler in wrestlers %}
+        <input type="checkbox" name="wrestlers" value="{{ wrestler.id }}" id="wrestler_{{ wrestler.id }}">
+        <label for="wrestler_{{ wrestler.id }}">{{ wrestler.name }}</label><br>
+      {% endfor %}
+    </fieldset>
+    <button type="submit">Save Draft</button>
+  </form>
+{% endblock %}
