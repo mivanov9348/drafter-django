@@ -89,10 +89,8 @@
     </style>
 
     <div class="filters">
-        <a href="?filter=all">Всички</a>
-        <a href="?filter=high_rating">Най-висок рейтинг</a>
-        <a href="?filter=heavyweight">Тежка категория</a>
-        <a href="?filter=lightweight">Лека категория</a>
+        <a href="?filter=all">All</a>
+        <a href="?filter=high_rating">Higher Rating</a>
     </div>
 
     <div class="wrestlers-container">
@@ -104,10 +102,8 @@
                 <img src="{% static 'images/default-wrestler.jpg' %}" alt="No Image">
             {% endif %}
             <h3>{{ wrestler.name }}</h3>
-            <p>Възраст: {{ wrestler.age }}</p>
-            <p>Тегло: {{ wrestler.weight }} кг</p>
-            <p>Височина: {{ wrestler.height }} см</p>
-            <p>Рейтинг: {{ wrestler.overall_rating }}</p>
+            <p>Age: {{ wrestler.age }}</p>
+            <p>Rating: {{ wrestler.overall_rating }}</p>
         </div>
         {% endfor %}
     </div>
