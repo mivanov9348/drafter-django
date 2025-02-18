@@ -1,0 +1,90 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Customize Draft</h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Поле за име на драфта -->
+        <div class="form-group">
+            <label for="id_name">Draft Name:</label>
+            <input type="text" name="name" id="id_name" value="{{ draft_name }}" placeholder="Enter draft name">
+            {% if errors.name %}
+                <div class="error">{{ errors.name }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Секция за селекция на брандове -->
+        <h3>Select Brands:</h3>
+        <div class="brand-list">
+            {% for brand in brands %}
+                <div class="brand-option">
+                    <input type="checkbox" name="brands" id="brand_{{ brand.id }}" value="{{ brand.id }}">
+                    <label for="brand_{{ brand.id }}">{{ brand.name }}</label>
+                </div>
+            {% endfor %}
+            {% if errors.brands %}
+                <div class="error">{{ errors.brands }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="submit-btn">Create Draft</button>
+    </form>
+</div>
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #333;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    h2, h3 {
+        margin-bottom: 15px;
+    }
+    label {
+        font-size: 18px;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+    }
+    .brand-list {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        margin-bottom: 20px;
+    }
+    .brand-option {
+        margin: 5px 0;
+        font-size: 16px;
+    }
+    .submit-btn {
+        background: #ff4500;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+    .submit-btn:hover {
+        background: #e03e00;
+    }
+    .error {
+        color: #ff6b6b;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
