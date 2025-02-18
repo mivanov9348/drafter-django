@@ -18,7 +18,6 @@ wrestlers_data = [
     {"name": "Edge", "age": 50, "weight": 113.0, "height": 1.96, "overall_rating": 96},
 ]
 
-
 for wrestler in wrestlers_data:
     obj, created = Wrestler.objects.get_or_create(
         name=wrestler["name"],

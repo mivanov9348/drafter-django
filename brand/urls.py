@@ -1,11 +1,11 @@
 from django.urls import path
-from .views import brand_list, brand_create, brand_delete
+from .views import brand_list, brand_create, delete_brand
 
 app_name ='brand'
 
 urlpatterns = [
     path('brands/', brand_list, name='brand_list'),
     path('brands/create/', brand_create, name='brand_create'),
-    path('brands/<int:pk>/delete/', brand_delete, name='brand_delete'),
+    path('delete/<int:brand_id>/', delete_brand, name='brand_delete'),
 
 ]

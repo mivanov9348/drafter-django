@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="bg">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WWE Draft - Home</title>
+    <style>
+        /* Можеш да поставиш тук основните стилове за всички страници */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+        }
+        header a {
+            color: #ff4500;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        header a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Добре дошли в WWE Draft</h1>
-    {% if user.is_authenticated %}
-        <p>Здравей, {{ user.username }}! <a href="{% url 'logout' %}">Изход</a></p>
-    {% else %}
-        <a href="{% url 'login' %}">Вход</a> | <a href="{% url 'register' %}">Регистрация</a>
-    {% endif %}
+    <header>
+        <h1>Welcome To Drafter</h1>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }}! <a href="{% url 'logout' %}">Logout</a></p>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </header>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>

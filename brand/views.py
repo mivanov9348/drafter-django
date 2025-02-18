@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Brand
 from django.shortcuts import render, redirect
@@ -22,9 +23,12 @@ def brand_create(request):
     return render(request, 'brand/brand_create_modal.html', {'form': form})
 
 @login_required
-def brand_delete(request, pk):
-    brand = get_object_or_404(Brand, pk=pk, owner=request.user)
-    if request.method == 'POST':
-        brand.delete()
-        return redirect('brand:brand_list')
-    return render(request, 'brand/brand_confirm_delete.html', {'brand': brand})
+def delete_brand(request, brand_id):
+    if request.method == "POST":
+        try:
+            brand = get_object_or_404(Brand, id=brand_id, owner=request.user)
+            brand.delete()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)

@@ -52,11 +52,11 @@
     .brand-table-container tbody tr:hover {
         background-color: #555;
     }
-    /* Стил за delete иконата */
     .delete-icon {
         color: #ff4500;
         text-decoration: none;
         font-size: 18px;
+        cursor: pointer;
         transition: color 0.3s;
     }
     .delete-icon:hover {
@@ -77,14 +77,12 @@
         </thead>
         <tbody>
         {% for brand in brands %}
-        <tr>
+        <tr id="brand-row-{{ brand.id }}">
             <td>{{ brand.name }}</td>
             <td>1</td>
             <td>
-                <!-- Линкът води към URL за изтриване, където ще се покаже страница за потвърждение -->
-                <a href="{% url 'brand:brand_delete' brand.id %}" class="delete-icon" title="Delete">
-                    🗑
-                </a>
+                <!-- Добавяме SweetAlert onclick събитие -->
+                <span class="delete-icon" onclick="confirmDelete({{ brand.id }})">🗑</span>
             </td>
         </tr>
         {% empty %}
@@ -95,4 +93,44 @@
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmDelete(brandId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ff4500",
+        cancelButtonColor: "#555",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/delete/${brandId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Deleted!", "Your brand has been deleted.", "success");
+                    document.getElementById(`brand-row-${brandId}`).remove();
+                } else {
+                    const errorMsg = data.error ? data.error : "Failed to delete the brand.";
+                    Swal.fire("Error!", errorMsg, "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error!", "Failed to delete the brand.", "error");
+            });
+        }
+    });
+}
+
+</script>
+
 {% endblock %}
