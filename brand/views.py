@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import BrandForm
 
 def brand_list(request):
-    brands = Brand.objects.filter(owner=request.user).prefetch_related('wrestlers')
+    brands = Brand.objects.filter(owner=request.user).prefetch_related('wrestler_links')
     return render(request, 'brand/brands.html', {'brands': brands})
 
 @login_required

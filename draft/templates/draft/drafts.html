@@ -19,11 +19,9 @@
                 <td>{{ draft.name }}</td>
                 <td>{{ draft.brands.count }}</td>
                 <td>
-                    <!-- Линк за стартиране -->
                     <a href="{% url 'draft:create_draft' draft.id %}" title="Start Draft">
-                        <button class="start-btn">Start</button>
+                        <button class="start-btn">Edit</button>
                     </a>
-                    <!-- Линк за изтриване със SweetAlert (data-url съдържа URL-то за изтриване) -->
                     <a href="#" class="delete-draft" data-url="{% url 'draft:delete_draft' draft.id %}" title="Delete Draft">
                         <span class="delete-icon">&#128465;</span>
                     </a>

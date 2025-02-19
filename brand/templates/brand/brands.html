@@ -69,27 +69,27 @@
     <a href="{% url 'brand:brand_create' %}" class="btn btn-primary">Create Brand</a>
     <table>
         <thead>
-        <tr>
-            <th>Name</th>
-            <th>Number of Wrestlers</th>
-            <th>Actions</th>
-        </tr>
+            <tr>
+                <th>Name</th>
+                <th>Number of Wrestlers</th>
+                <th>Actions</th>
+            </tr>
         </thead>
         <tbody>
-        {% for brand in brands %}
-        <tr id="brand-row-{{ brand.id }}">
-            <td>{{ brand.name }}</td>
-            <td>1</td>
-            <td>
-                <!-- Добавяме SweetAlert onclick събитие -->
-                <span class="delete-icon" onclick="confirmDelete({{ brand.id }})">🗑</span>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">No brands found.</td>
-        </tr>
-        {% endfor %}
+            {% for brand in brands %}
+            <tr id="brand-row-{{ brand.id }}">
+                <td>{{ brand.name }}</td>
+                <td>{{ brand.wrestler_links.count }}</td>
+                <td>
+                    <!-- Добавяме SweetAlert onclick събитие -->
+                    <span class="delete-icon" onclick="confirmDelete({{ brand.id }})">🗑</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No brands found.</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
@@ -130,7 +130,6 @@ function confirmDelete(brandId) {
         }
     });
 }
-
 </script>
 
 {% endblock %}

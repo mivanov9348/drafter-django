@@ -1,0 +1,127 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+    <h2 style="text-align: center; margin-top: 20px; color: #333;">Matches</h2>
+
+    <!-- Add Match Button -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMatchModal">
+            Add Match
+        </button>
+    </div>
+
+    <!-- Matches Table -->
+    <table style="width:100%; border-collapse: collapse; margin: 20px auto; background-color: #ffffff; color: #333;">
+        <thead>
+            <tr style="background-color: #ddd; color: #000;">
+                <th style="padding: 10px; border: 1px solid #ccc;">Match Type</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Participants</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Winner</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Date</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in page_obj %}
+                <tr style="background-color: #f9f9f9;">
+                    <!-- Match Type -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">{{ match.get_match_type_display }}</td>
+
+                    <!-- Participants: list names separated by " vs " -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% for wrestler in match.participants.all %}
+                            {{ wrestler.name }}{% if not forloop.last %} vs {% endif %}
+                        {% empty %}
+                            No participants
+                        {% endfor %}
+                    </td>
+
+                    <!-- Winner -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% if match.winner %}{{ match.winner.name }}{% else %}N/A{% endif %}
+                    </td>
+
+                    <!-- Date -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">{{ match.date|date:"Y-m-d" }}</td>
+
+                    <!-- Actions: Trash bin icon linking to delete_match view -->
+                    <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">
+                        <a href="{% url 'matches:delete_match' match.id %}" title="Delete Match" style="color: #dc3545; text-decoration: none; font-size: 18px;">
+                            🗑
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="padding: 10px; text-align: center;">No matches found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div style="text-align: center; margin: 20px; color: #333;">
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        <div style="margin-top: 10px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" style="margin-right: 10px; color: #007bff;">&laquo; Previous</a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <strong>{{ num }}</strong>
+                {% else %}
+                    <a href="?page={{ num }}" style="margin: 0 5px; color: #007bff;">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" style="margin-left: 10px; color: #007bff;">Next &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Add Match Modal -->
+    <div class="modal fade" id="addMatchModal" tabindex="-1" aria-labelledby="addMatchModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{% url 'matches:add_match' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMatchModalLabel">Add New Match</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Match Type Dropdown -->
+                        <div class="mb-3">
+                            <label for="matchType" class="form-label">Match Type</label>
+                            <select class="form-select" id="matchType" name="match_type" required>
+                                {% for key, value in match.MATCH_TYPES %}
+                                    <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Participants Multi-select -->
+                        <div class="mb-3">
+                            <label for="participants" class="form-label">Select Participants</label>
+                            <select class="form-select" id="participants" name="participants" multiple required>
+                                {% for wrestler in all_wrestlers %}
+                                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Hold down the Ctrl (Windows) / Command (Mac) key to select multiple options.</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Match</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
