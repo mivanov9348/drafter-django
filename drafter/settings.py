@@ -30,7 +30,9 @@ INSTALLED_APPS = [
     'wrestler',
     'brand',
     'core',
-    'draft'
+    'draft',
+    'matches',
+    'rivalries'
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
