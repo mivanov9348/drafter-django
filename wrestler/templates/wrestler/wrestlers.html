@@ -91,6 +91,10 @@
     <div class="filters">
         <a href="?filter=all">All</a>
         <a href="?filter=high_rating">Higher Rating</a>
+        <a href="?filter=age">Sort by Age</a>
+        <a href="?filter=name">Sort by Name</a>
+        <a href="?filter=male">Male Wrestlers</a>
+        <a href="?filter=female">Female Wrestlers</a>
     </div>
 
     <div class="wrestlers-container">
@@ -104,6 +108,7 @@
             <h3>{{ wrestler.name }}</h3>
             <p>Age: {{ wrestler.age }}</p>
             <p>Rating: {{ wrestler.overall_rating }}</p>
+            <p>Gender: {{ wrestler.get_gender_display }}</p>
         </div>
         {% endfor %}
     </div>

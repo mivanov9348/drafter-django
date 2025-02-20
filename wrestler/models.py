@@ -1,14 +1,17 @@
 from django.db import models
 
 class Wrestler(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female')
+    ]
+
     name = models.CharField(max_length=100, unique=True)
-    alias = models.CharField(max_length=100, blank=True, null=True)
     age = models.IntegerField()
-    overall_rating = models.IntegerField()  # Глобален рейтинг
+    overall_rating = models.IntegerField()
     image = models.ImageField(upload_to='wrestlers/', null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
-
-    enemies = models.ManyToManyField('self', symmetrical=False, related_name='rivalries', blank=True)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES, default='male')
 
     def __str__(self):
         return self.name
