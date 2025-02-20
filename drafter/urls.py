@@ -12,7 +12,8 @@ urlpatterns = [
     path('wrestlers/', include('wrestler.urls')),
     path('brands/', include('brand.urls')),
     path('draft/', include('draft.urls')),
-    path('matches/', include('matches.urls'))
+    path('matches/', include('matches.urls')),
+    path('tournament/', include('tournament.urls'))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

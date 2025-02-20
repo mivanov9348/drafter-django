@@ -1,0 +1,91 @@
+{% extends 'core/dashboard.html' %}
+
+{% block head %}
+    {{ block.super }}
+    <style>
+        /* Общи стилове за формата */
+        .tournament-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Стил за select полето за участници */
+        #participants {
+            height: 500px;
+            resize: vertical; /
+        }
+
+        /* Подобряване на визуализацията на формата */
+        .form-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-select, .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-text {
+            color: #666;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Create New Tournament</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" class="tournament-form">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Tournament Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="goal" class="form-label">Title</label>
+            <select class="form-select" id="goal" name="goal" required>
+                <option value="world">World Championship</option>
+                <option value="intercontinental">Intercontinental Championship</option>
+                <option value="tag_team">Tag Team Championship</option>
+                <option value="women">Women's Championship</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="wrestlers_count" class="form-label">Number of Wrestlers</label>
+            <select class="form-select" id="wrestlers_count" name="wrestlers_count" required>
+                <option value="4">4 Wrestlers</option>
+                <option value="8">8 Wrestlers</option>
+                <option value="16">16 Wrestlers</option>
+                <option value="24">24 Wrestlers</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="participants" class="form-label">Select Participants</label>
+            <select class="form-select" id="participants" name="participants" multiple required>
+                {% for wrestler in all_wrestlers %}
+                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="form-text">Hold down the Ctrl (Windows) / Command (Mac) key to select multiple options.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Tournament</button>
+    </form>
+</div>
+{% endblock %}

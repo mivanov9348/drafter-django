@@ -1,0 +1,34 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">My Tournaments</h1>
+
+    <div class="mb-4">
+        <a href="{% url 'tournament:customize_tournament' %}" class="btn btn-primary">Create Tournament</a>
+    </div>
+
+    {% if tournaments %}
+        <div class="row">
+            {% for tournament in tournaments %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ tournament.name }}</h5>
+                            <p class="card-text">
+                                <strong>Title:</strong> {{ tournament.get_goal_display }}<br>
+                                <strong>Wrestlers:</strong> {{ tournament.wrestlers_count }}<br>
+                                <strong>Created:</strong> {{ tournament.created_at|date:"F d, Y" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You haven't created any tournaments yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

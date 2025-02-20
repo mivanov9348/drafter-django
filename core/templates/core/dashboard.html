@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <nav class="navbar">
     <div class="title">Drafter</div>
@@ -69,6 +69,7 @@
         <li><a href="{% url 'matches:match_list' %}">Matches</a></li>
         <li><a href="">Rivalries</a></li>
         <li><a href="">Belts</a></li>
+        <li><a href="{% url 'tournament:tournaments_list' %}">Tournaments</a></li>
         <li><a href="#">Account</a></li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
     </ul>

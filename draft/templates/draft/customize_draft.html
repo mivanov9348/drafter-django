@@ -6,7 +6,6 @@
     <form method="POST">
         {% csrf_token %}
 
-        <!-- Поле за име на драфта -->
         <div class="form-group">
             <label for="id_name">Draft Name:</label>
             <input type="text" name="name" id="id_name" value="{{ draft_name }}" placeholder="Enter draft name">
@@ -15,7 +14,6 @@
             {% endif %}
         </div>
 
-        <!-- Секция за селекция на брандове -->
         <h3>Select Brands:</h3>
         <div class="brand-list">
             {% for brand in brands %}
