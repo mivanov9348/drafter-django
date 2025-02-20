@@ -1,12 +1,15 @@
 {% extends 'core/dashboard.html' %}
 
 {% block content %}
+{% load static %}
 <div class="container">
     <h2>Draft: {{ draft.name }}</h2>
     <div class="wrestlers-list-container">
         <ul class="wrestlers-list">
             {% for wrestler in all_wrestlers %}
             <li class="wrestler-item">
+                <img src="{% if wrestler.image %}{{ wrestler.image.url }}{% else %}{% static 'images/default-wrestler-icon.png' %}{% endif %}"
+                     alt="{{ wrestler.name }}" class="wrestler-icon">
                 <span class="wrestler-name">{{ wrestler.name }}</span>
                 <span class="wrestler-gender">{{ wrestler.gender }}</span>
                 <span class="wrestler-rating">{{ wrestler.overall_rating }}</span>
@@ -89,7 +92,19 @@
         border-bottom: none;
     }
 
-    .wrestler-name { flex: 2; }
+    .wrestler-icon {
+        width: 30px; /* Размер на иконата */
+        height: 30px;
+        border-radius: 50%; /* Кръгла форма */
+        object-fit: cover; /* Запълва кръга без изкривяване */
+        margin-right: 10px; /* Разстояние до името */
+    }
+
+    .wrestler-name {
+        flex: 2;
+        display: flex;
+        align-items: center; /* Центрира името вертикално спрямо иконата */
+    }
     .wrestler-gender { flex: 1; text-align: center; }
     .wrestler-rating { flex: 1; text-align: right; margin-right: 10px; }
 
@@ -164,18 +179,18 @@
     document.querySelectorAll('.add-wrestler-btn').forEach(button => {
         button.addEventListener('click', function() {
             const wrestlerId = this.getAttribute('data-wrestler-id');
-            fetch('/draft/add-wrestler/', {  // Add leading slash to ensure absolute path
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: `wrestler_id=${wrestlerId}&draft_id={{ draft.id }}`
+            fetch('/draft/add-wrestler/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `wrestler_id=${wrestlerId}&draft_id={{ draft.id }}`
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    location.reload(); // Refresh to update UI
+                    location.reload();
                 }
             });
         });
