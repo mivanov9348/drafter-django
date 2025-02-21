@@ -1,6 +1,25 @@
 {% extends 'core/dashboard.html' %}
 
 {% block content %}
+<style>
+    .tournament-card {
+        color: #2c3e50; /* Тъмно синьо-сиво за основния текст */
+    }
+
+    .card-title {
+        color: #e74c3c; /* Червеникав цвят за името на турнира */
+        font-weight: bold;
+    }
+
+    .card-text strong {
+        color: #2980b9; /* Син цвят за заглавията в описанието */
+    }
+
+    .card-text {
+        color: #555; /* Средно сиво за останалия текст */
+    }
+</style>
+
 <div class="container mt-4">
     <h1 class="mb-4">My Tournaments</h1>
 
@@ -12,7 +31,7 @@
         <div class="row">
             {% for tournament in tournaments %}
                 <div class="col-md-4 mb-3">
-                    <div class="card">
+                    <div class="card tournament-card">
                         <div class="card-body">
                             <h5 class="card-title">{{ tournament.name }}</h5>
                             <p class="card-text">
@@ -20,6 +39,7 @@
                                 <strong>Wrestlers:</strong> {{ tournament.wrestlers_count }}<br>
                                 <strong>Created:</strong> {{ tournament.created_at|date:"F d, Y" }}
                             </p>
+                            <a href="{% url 'tournament:view_tournament' tournament.id %}" class="btn btn-success">View Tournament</a>
                         </div>
                     </div>
                 </div>

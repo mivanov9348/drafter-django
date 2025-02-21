@@ -1,0 +1,31 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ tournament.name }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Tournament Details</h5>
+            <p class="card-text">
+                <strong>Title:</strong> {{ tournament.get_goal_display }}<br>
+                <strong>Wrestlers:</strong> {{ tournament.wrestlers_count }}<br>
+                <strong>Created:</strong> {{ tournament.created_at|date:"F d, Y" }}
+            </p>
+        </div>
+    </div>
+
+    <h2 class="mb-3">Tournament Bracket</h2>
+    {% if tournament.brackets %}
+        <div class="bracket-container">
+            <p>Bracket data: {{ tournament.brackets }}</p>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No brackets available for this tournament yet.
+        </div>
+    {% endif %}
+
+    <a href="" class="btn btn-secondary mt-3">Back to My Tournaments</a>
+</div>
+{% endblock %}
