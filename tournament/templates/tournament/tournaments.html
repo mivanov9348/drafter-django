@@ -1,5 +1,10 @@
 {% extends 'core/dashboard.html' %}
 
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
 {% block content %}
 <style>
     .tournament-card {
@@ -17,6 +22,18 @@
 
     .card-text {
         color: #555; /* Средно сиво за останалия текст */
+    }
+
+    /* Стил за бутона за изтриване */
+    .btn-delete {
+        margin-left: 10px;
+        color: #fff;
+        background-color: #dc3545; /* Червен цвят за изтриване */
+        border: none;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333; /* По-тъмно червено при ховер */
     }
 </style>
 
@@ -40,6 +57,12 @@
                                 <strong>Created:</strong> {{ tournament.created_at|date:"F d, Y" }}
                             </p>
                             <a href="{% url 'tournament:view_tournament' tournament.id %}" class="btn btn-success">View Tournament</a>
+                            <form method="POST" action="{% url 'tournament:delete_tournament' tournament.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this tournament and its matches?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

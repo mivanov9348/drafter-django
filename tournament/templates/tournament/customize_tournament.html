@@ -75,6 +75,13 @@
         .form-text {
             color: #666;
         }
+
+        /* Стил за брояча */
+        .selected-count {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #2980b9; /* Син цвят за брояча */
+        }
     </style>
 {% endblock %}
 
@@ -148,9 +155,31 @@
                 </table>
             </div>
             <div class="form-text">Select the wrestlers by checking the boxes next to their names.</div>
+            <div class="selected-count">Selected: <span id="selected-count">0</span></div>
         </div>
 
         <button type="submit" class="btn btn-primary">Create Tournament</button>
     </form>
 </div>
+
+<script>
+    // JavaScript за брояча
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('input[name="participants"]');
+        const countDisplay = document.getElementById('selected-count');
+
+        function updateCount() {
+            const selectedCount = document.querySelectorAll('input[name="participants"]:checked').length;
+            countDisplay.textContent = selectedCount;
+        }
+
+        // Актуализирай броя при всяка промяна на checkbox
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateCount);
+        });
+
+        // Първоначална проверка
+        updateCount();
+    });
+</script>
 {% endblock %}
