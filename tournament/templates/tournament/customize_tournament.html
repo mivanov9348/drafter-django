@@ -9,19 +9,59 @@
             margin: 0 auto;
         }
 
-        /* Стил за select полето за участници */
-        #participants {
-            height: 500px;
-            resize: vertical; /
+        /* Стил за таблицата с участници */
+        .participants-table-container {
+            height: 500px; /* Фиксирана височина от точно 500px */
+            overflow-y: auto; /* Скролбар при надхвърляне */
+            border: 1px solid #ced4da; /* Рамка */
+            border-radius: 5px; /* Заоблени ъгли */
+            background-color: #fff; /* Бял фон */
         }
 
-        /* Подобряване на визуализацията на формата */
+        /* Стил за таблицата със съобщения */
+        .messages-table-container {
+            max-height: 200px; /* Фиксирана височина за съобщенията */
+            overflow-y: auto;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #fff;
+            margin-bottom: 20px;
+        }
+
+        /* Общи стилове за таблиците */
+        .participants-table,
+        .messages-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .participants-table th,
+        .participants-table td,
+        .messages-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .participants-table th {
+            background-color: #f8f9fa; /* Светъл фон за заглавията */
+            position: sticky; /* Фиксира заглавията при скролиране */
+            top: 0;
+            z-index: 1;
+        }
+
+        .participants-table tr:hover {
+            background-color: #f1f1f1; /* Ефект при посочване с мишката */
+        }
+
+        /* Стилове за формата */
         .form-label {
             font-weight: bold;
             color: #333;
         }
 
-        .form-select, .form-control {
+        .form-select,
+        .form-control {
             border-radius: 5px;
             border: 1px solid #ced4da;
         }
@@ -43,9 +83,19 @@
     <h1 class="mb-4">Create New Tournament</h1>
 
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
+        <div class="messages-table-container">
+            <table class="messages-table">
+                <tbody>
+                    {% for message in messages %}
+                        <tr>
+                            <td>
+                                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 
     <form method="POST" class="tournament-form">
@@ -71,18 +121,33 @@
                 <option value="4">4 Wrestlers</option>
                 <option value="8">8 Wrestlers</option>
                 <option value="16">16 Wrestlers</option>
-                <option value="24">24 Wrestlers</option>
+                <option value="32">32 Wrestlers</option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label for="participants" class="form-label">Select Participants</label>
-            <select class="form-select" id="participants" name="participants" multiple required>
-                {% for wrestler in all_wrestlers %}
-                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
-                {% endfor %}
-            </select>
-            <div class="form-text">Hold down the Ctrl (Windows) / Command (Mac) key to select multiple options.</div>
+            <label class="form-label">Select Participants</label>
+            <div class="participants-table-container">
+                <table class="participants-table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Wrestler Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for wrestler in all_wrestlers %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="participants" value="{{ wrestler.id }}">
+                                </td>
+                                <td>{{ wrestler.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-text">Select the wrestlers by checking the boxes next to their names.</div>
         </div>
 
         <button type="submit" class="btn btn-primary">Create Tournament</button>

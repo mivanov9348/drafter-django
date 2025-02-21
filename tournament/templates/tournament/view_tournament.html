@@ -15,17 +15,87 @@
         </div>
     </div>
 
-    <h2 class="mb-3">Tournament Bracket</h2>
-    {% if tournament.brackets %}
-        <div class="bracket-container">
-            <p>Bracket data: {{ tournament.brackets }}</p>
-        </div>
+    <h2 class="mb-3">Participating Wrestlers</h2>
+    {% if tournament.wrestlers.exists %}
+        <ul class="list-group mb-4">
+            {% for wrestler in tournament.wrestlers.all %}
+                <li class="list-group-item">{{ wrestler.name }} ({{ wrestler.gender|title }})</li>
+            {% endfor %}
+        </ul>
     {% else %}
-        <div class="alert alert-info">
-            No brackets available for this tournament yet.
+        <div class="alert alert-warning">
+            No wrestlers assigned to this tournament yet.
         </div>
     {% endif %}
 
-    <a href="" class="btn btn-secondary mt-3">Back to My Tournaments</a>
+    <h2 class="mb-3">Tournament Matches</h2>
+    {% if matches %}
+        <div class="bracket-container">
+            <h3>Round 1</h3>
+            <div class="bracket">
+                {% for match in matches %}
+                    <div class="match">
+                        {% for participant in match.participants.all %}
+                            <div class="wrestler">{{ participant.name }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info mb-3">
+            No matches available for this tournament yet.
+        </div>
+        <form method="post" action="{% url 'tournament:draw_bracket' tournament.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Draw Matches</button>
+        </form>
+    {% endif %}
+
+    <a href="{% url 'tournament:tournaments_list' %}" class="btn btn-secondary mt-3">Back to My Tournaments</a>
 </div>
+
+<style>
+    .bracket-container {
+        border: 1px solid #ddd;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+    .bracket {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .match {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #fff;
+        width: 300px;
+    }
+    .wrestler {
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 5px;
+        border-bottom: 1px dashed #ddd;
+    }
+    .wrestler:last-child {
+        border-bottom: none;
+    }
+    .list-group-item {
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+    /* Нови стилове за Tournament Details */
+    .card-title {
+        color: #e74c3c; /* Червен цвят за заглавието */
+    }
+    .card-text {
+        color: #34495e; /* Тъмно синьо-сиво за текста */
+    }
+    .card-text strong {
+        color: #2980b9; /* Син цвят за удебелените етикети */
+    }
+</style>
 {% endblock %}
