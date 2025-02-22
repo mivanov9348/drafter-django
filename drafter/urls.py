@@ -4,9 +4,11 @@ from accounts.views import home
 from django.conf import settings
 from django.conf.urls.static import static
 
+from core.views import dashboard
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    path('', dashboard, name='home'),
     path('accounts/', include('accounts.urls')),
     path('core/', include('core.urls')),
     path('wrestlers/', include('wrestler.urls')),
