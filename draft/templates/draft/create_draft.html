@@ -13,8 +13,9 @@
                 <span class="wrestler-name">{{ wrestler.name }}</span>
                 <span class="wrestler-gender">{{ wrestler.gender }}</span>
                 <span class="wrestler-rating">{{ wrestler.overall_rating }}</span>
-                <button class="add-wrestler-btn" data-wrestler-id="{{ wrestler.id }}" {% if not draft.is_active %}disabled{% endif %}>+
-                </button>
+                {% if draft.is_active %}
+                <button class="add-wrestler-btn" data-wrestler-id="{{ wrestler.id }}">+</button>
+                {% endif %}
             </li>
             {% empty %}
             <li class="wrestler-item">No wrestlers found.</li>
@@ -23,8 +24,13 @@
     </div>
 
     <div class="draft-controls">
-        <button id="auto-pick-btn" {% if not draft.is_active %}disabled{% endif %}>Auto Pick</button>
-        <button id="finalize-draft-btn" {% if not draft.is_active %}disabled{% endif %}>Finalize Draft</button>
+        {% if draft.is_active %}
+        <button id="auto-pick-btn">Auto Pick</button>
+        <button id="finalize-draft-btn">Finalize Draft</button>
+        <button id="save-draft-btn">Save Draft</button>
+        {% else %}
+        <button id="edit-draft-btn">Edit Draft</button>
+        {% endif %}
     </div>
 
     <div class="brands-grid">
@@ -93,17 +99,17 @@
     }
 
     .wrestler-icon {
-        width: 30px; /* Размер на иконата */
+        width: 30px;
         height: 30px;
-        border-radius: 50%; /* Кръгла форма */
-        object-fit: cover; /* Запълва кръга без изкривяване */
-        margin-right: 10px; /* Разстояние до името */
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
     }
 
     .wrestler-name {
         flex: 2;
         display: flex;
-        align-items: center; /* Центрира името вертикално спрямо иконата */
+        align-items: center;
     }
     .wrestler-gender { flex: 1; text-align: center; }
     .wrestler-rating { flex: 1; text-align: right; margin-right: 10px; }
@@ -175,6 +181,7 @@
     }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.querySelectorAll('.add-wrestler-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -190,12 +197,27 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Something is Wrong!'
+                    });
                 }
             });
         });
     });
 
+    {% if draft.is_active %}
     document.getElementById('auto-pick-btn').addEventListener('click', function() {
         fetch('/draft/auto-pick/{{ draft.id }}/', {
             method: 'POST',
@@ -204,7 +226,21 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Something went wrong!'
+                });
             }
         });
     });
@@ -218,8 +254,61 @@
         .then(data => {
             if (data.status === 'success') {
                 location.reload();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Грешка',
+                    text: data.message || 'Нещо се обърка!'
+                });
             }
         });
     });
+
+    document.getElementById('save-draft-btn').addEventListener('click', function() {
+        fetch('/draft/save/{{ draft.id }}/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Saved!',
+                    text: 'Draft saved successfully!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to save draft!'
+                });
+            }
+        });
+    });
+    {% else %}
+    document.getElementById('edit-draft-btn').addEventListener('click', function() {
+        fetch('/draft/edit/{{ draft.id }}/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to edit draft!'
+                });
+            }
+        });
+    });
+    {% endif %}
 </script>
 {% endblock %}
