@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'core',
     'draft',
     'matches',
-    'rivalries',
     'tournament'
 ]
 

@@ -35,6 +35,7 @@
         .nav-links {
             list-style: none;
             display: flex;
+            align-items: center;
         }
         .nav-links li {
             margin-left: 20px;
@@ -54,6 +55,17 @@
             padding: 40px;
             text-align: center;
         }
+        .dropdown-menu {
+            background-color: #ff4500;
+            border: none;
+        }
+        .dropdown-item {
+            color: white;
+            padding: 10px 15px;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -62,16 +74,21 @@
 <nav class="navbar">
     <div class="title">Drafter</div>
     <ul class="nav-links">
-        <li><a href="{% url 'draft:customize_draft' %}">New Draft</a></li>
         <li><a href="{% url 'draft:list_drafts' %}">Drafts</a></li>
         <li><a href="{% url 'brand:brand_list' %}">Brands</a></li>
         <li><a href="{% url 'wrestler:all_wrestlers' %}">Wrestlers</a></li>
         <li><a href="{% url 'matches:match_list' %}">Matches</a></li>
-        <li><a href="">Rivalries</a></li>
         <li><a href="">Belts</a></li>
         <li><a href="{% url 'tournament:tournaments_list' %}">Tournaments</a></li>
-        <li><a href="#">Account</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Account
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </li>
     </ul>
 </nav>
 <div class="content">

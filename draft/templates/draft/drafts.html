@@ -2,7 +2,12 @@
 
 {% block content %}
 <div class="container">
-    <h2>My Drafts</h2>
+    <div class="header-container">
+        <h2>My Drafts</h2>
+        <a href="{% url 'draft:customize_draft' %}" title="Create New Draft">
+            <button class="add-btn">+</button>
+        </a>
+    </div>
     <table>
         <thead>
             <tr>
@@ -23,7 +28,7 @@
                         <button class="start-btn">Edit</button>
                     </a>
                     <a href="#" class="delete-draft" data-url="{% url 'draft:delete_draft' draft.id %}" title="Delete Draft">
-                        <span class="delete-icon">&#128465;</span>
+                        <span class="delete-icon">🗑</span>
                     </a>
                 </td>
             </tr>
@@ -43,7 +48,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
    document.addEventListener('DOMContentLoaded', function() {
-    // Attach event listener for all links with class "delete-draft"
     document.querySelectorAll('.delete-draft').forEach(function(link) {
         link.addEventListener('click', function(event) {
             event.preventDefault();
@@ -60,7 +64,6 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Set the form's action URL and submit the form
                     const form = document.getElementById('delete-form');
                     form.setAttribute('action', deleteUrl);
                     form.submit();
@@ -69,7 +72,6 @@
         });
     });
 });
-
 </script>
 
 <style>
@@ -81,9 +83,15 @@
         border-radius: 10px;
         color: white;
     }
+    .header-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
     h2 {
         text-align: center;
-        margin-bottom: 20px;
+        margin: 0;
     }
     table {
         width: 100%;
@@ -118,6 +126,23 @@
         cursor: pointer;
     }
     .start-btn:hover {
+        background: #e03e00;
+    }
+    .add-btn {
+        background: #ff4500;
+        border: none;
+        color: white;
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-left: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .add-btn:hover {
         background: #e03e00;
     }
 </style>
