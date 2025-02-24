@@ -1,0 +1,105 @@
+{% extends 'core/dashboard.html' %}
+
+{% block content %}
+    <h2 style="text-align: center; margin-top: 20px; color: #333;">Championships</h2>
+
+    <!-- Add Championship Button -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addChampionshipModal">
+            Add Championship
+        </button>
+    </div>
+
+    <!-- Championships Table -->
+    <table style="width:100%; border-collapse: collapse; margin: 20px auto; background-color: #ffffff; color: #333;">
+        <thead>
+            <tr style="background-color: #ddd; color: #000;">
+                <th style="padding: 10px; border: 1px solid #ccc;">Name</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Type</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Gender</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Current Champion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for championship in championships %}
+                <tr style="background-color: #f9f9f9;">
+                    <td style="padding: 10px; border: 1px solid #ccc;">{{ championship.name }}</td>
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% if championship.is_single %}Singles{% else %}Tag Team{% endif %}
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ccc;">{{ championship.gender|title }}</td>
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% if championship.current_champion %}
+                            {{ championship.current_champion.name }}
+                        {% else %}
+                            Vacant
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" style="padding: 10px; text-align: center;">No championships found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add Championship Modal -->
+    <div class="modal fade" id="addChampionshipModal" tabindex="-1" aria-labelledby="addChampionshipModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{% url 'championships:add_championship' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addChampionshipModalLabel">Add New Championship</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Championship Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <!-- Type -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_single" name="is_single" checked>
+                                <label class="form-check-label" for="is_single">
+                                    Singles Title (uncheck for Tag Team)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <!-- Current Champion -->
+                        <div class="mb-3">
+                            <label for="current_champion" class="form-label">Current Champion (optional)</label>
+                            <select class="form-select" id="current_champion" name="current_champion">
+                                <option value="">No Champion (Vacant)</option>
+                                {% for wrestler in wrestlers %}
+                                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Championship</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
