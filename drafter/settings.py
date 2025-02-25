@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'draft',
     'matches',
     'tournament',
-    'championship'
+    'championship',
+    'manager_game'
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'

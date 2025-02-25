@@ -80,6 +80,7 @@
         <li><a href="{% url 'matches:match_list' %}">Matches</a></li>
         <li><a href="{% url 'championships:championship_list' %}">Championship</a></li>
         <li><a href="{% url 'tournament:tournaments_list' %}">Tournaments</a></li>
+        <li><a href="{% if user.games.exists %}{% url 'manager_game:game_dashboard' game_id=user.games.first.id %}{% else %}{% url 'manager_game:start_game' %}{% endif %}">Game</a></li>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Account
