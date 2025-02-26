@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import match_list, add_match, delete_match, auto_decide_winner
 
 app_name = 'matches'
