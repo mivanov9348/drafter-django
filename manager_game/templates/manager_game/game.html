@@ -2,35 +2,32 @@
 
 {% block content %}
     <h2 style="text-align: center; margin-top: 20px; color: #fff;">{{ game.name }}</h2>
-    <div style="max-width: 800px; margin: 20px auto;">
-        <h3 style="color: #fff;">PPV Events</h3>
-        <table style="width:100%; border-collapse: collapse; background-color: rgba(255, 255, 255, 0.1); color: #fff;">
-            <thead>
-                <tr style="background-color: rgba(255, 69, 0, 0.8);">
-                    <th style="padding: 10px; border: 1px solid #ccc;">Name</th>
-                    <th style="padding: 10px; border: 1px solid #ccc;">Date</th>
-                    <th style="padding: 10px; border: 1px solid #ccc;">Status</th>
-                    <th style="padding: 10px; border: 1px solid #ccc;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ppv in ppv_events %}
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #ccc;">{{ ppv.name }}</td>
-                        <td style="padding: 10px; border: 1px solid #ccc;">{{ ppv.date }}</td>
-                        <td style="padding: 10px; border: 1px solid #ccc;">
-                            {% if ppv.completed %}Completed{% else %}Pending{% endif %}
-                        </td>
-                        <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">
-                            {% if not ppv.completed %}
-                                <a href="{% url 'manager_game:simulate_ppv' game.id ppv.id %}" class="btn btn-success btn-sm">Simulate</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr><td colspan="4" style="text-align: center;">No PPV events scheduled yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+    <!-- Navbar с дните -->
+    <nav style="max-width: 800px; margin: 20px auto; background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px; overflow-x: auto; white-space: nowrap;">
+        <ul style="list-style: none; padding: 0; display: inline-flex; color: #fff;">
+            {% for day in days %}
+                <li style="padding: 5px 10px; {% if day.day_number == game.current_day %}background-color: rgba(255, 69, 0, 0.8); border-radius: 5px;{% endif %}">
+                    Day {{ day.day_number }}: {{ day.event }}
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <div style="max-width: 800px; margin: 20px auto; color: #fff;">
+        <h3>Current Day: Day {{ game.current_day }}</h3>
+        <p>Event: {{ current_event }}</p>
+        {% if current_event_type == 'PPV' and not current_ppv.completed %}
+            <a href="{% url 'manager_game:simulate_ppv' game.id current_ppv.id %}" class="btn btn-success">Simulate PPV</a>
+        {% endif %}
+        {% if error_message %}
+            <div class="alert alert-danger" style="margin-top: 10px;">{{ error_message }}</div>
+        {% endif %}
+        <form method="POST" action="{% url 'manager_game:next_day' game.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;" {% if not day_completed %}disabled{% endif %}>
+                Next Day
+            </button>
+        </form>
     </div>
 {% endblock %}
