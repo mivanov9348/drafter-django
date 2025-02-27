@@ -1,8 +1,9 @@
 {% extends 'core/dashboard.html' %}
 
 {% block content %}
-    <div style="position: relative; max-width: 800px; margin: 20px auto;">
-        <h2 style="text-align: center; margin-top: 0; color: #fff;">{{ game.name }}</h2>
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div style="position: relative; margin-bottom: 20px;">
+        <h2 style="text-align: center; color: #fff;">{{ game.name }}</h2>
         <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" style="position: absolute; top: 0; right: 0;">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this game? This action cannot be undone.');">
@@ -11,6 +12,7 @@
         </form>
     </div>
 
+    <!-- Календар -->
     <nav style="max-width: 800px; margin: 20px auto; background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px; overflow-x: auto; white-space: nowrap;">
         <ul style="list-style: none; padding: 0; display: inline-flex; color: #fff;">
             {% for day in days %}
@@ -21,6 +23,19 @@
         </ul>
     </nav>
 
+    <!-- Навигация с бутони -->
+    <nav style="background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+        <ul style="list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; color: #fff;">
+            <li><a href="{% url 'manager_game:game_dashboard' game.id %}" class="btn btn-outline-light">Dashboard</a></li>
+            <li><a href="{% url 'manager_game:game_matches' game.id %}" class="btn btn-outline-light">Matches</a></li>
+            <li><a href="{% url 'manager_game:game_brands' game.id %}" class="btn btn-outline-light">Brands</a></li>
+            <li><a href="{% url 'manager_game:power_rankings' game.id %}" class="btn btn-outline-light">Power Rankings</a></li>
+            <li><a href="{% url 'manager_game:championships' game.id %}" class="btn btn-outline-light">Championships</a></li>
+        </ul>
+    </nav>
+
+    <!-- Конкретното съдържание на всяка страница -->
+    {% block game_content %}
     <div style="max-width: 800px; margin: 20px auto; color: #fff;">
         <h3>Current Day: Day {{ game.current_day }}</h3>
         <p>Event: {{ current_event }}</p>
@@ -37,4 +52,6 @@
             </button>
         </form>
     </div>
+    {% endblock %}
+</div>
 {% endblock %}

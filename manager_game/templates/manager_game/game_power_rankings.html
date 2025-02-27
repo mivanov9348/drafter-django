@@ -1,0 +1,31 @@
+{% extends 'manager_game/game.html' %}
+
+{% block game_content %}
+<div style="color: #fff;">
+    <h3>Power Rankings for {{ game.name }}</h3>
+    {% if wrestlers %}
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Wrestler</th>
+                    <th>Wins</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wrestler in wrestlers %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ wrestler.name }}</td>
+                        <td>{{ wrestler.wins.count }}</td>
+                        <td>{{ wrestler.overall_rating }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No wrestler data available.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'manager_game/game.html' %}
+
+{% block game_content %}
+<div style="color: #fff;">
+    <h3>Championships in {{ game.name }}</h3>
+    {% if championships %}
+        <ul>
+            {% for championship in championships %}
+                <li>{{ championship.name }} - Current Champion: {{ championship.current_champion|default:"Vacant" }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No championships available.</p>
+    {% endif %}
+</div>
+{% endblock %}

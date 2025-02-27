@@ -1,0 +1,16 @@
+{% extends 'manager_game/game.html' %}
+
+{% block game_content %}
+<div style="color: #fff;">
+    <h3>Brands in {{ game.name }}</h3>
+    {% if brands %}
+        <ul>
+            {% for brand in brands %}
+                <li>{{ brand.name }} - {{ brand.wrestler_links.count }} wrestlers</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No brands available.</p>
+    {% endif %}
+</div>
+{% endblock %}
