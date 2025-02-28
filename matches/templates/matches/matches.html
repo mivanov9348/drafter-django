@@ -17,7 +17,9 @@
                 <th style="padding: 10px; border: 1px solid #ccc;">Match Type</th>
                 <th style="padding: 10px; border: 1px solid #ccc;">Participants</th>
                 <th style="padding: 10px; border: 1px solid #ccc;">Winner</th>
-                <th style="padding: 10px; border: 1px solid #ccc;">Date</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Day Number</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Game</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">PPV Event</th>
                 <th style="padding: 10px; border: 1px solid #ccc;">Actions</th>
             </tr>
         </thead>
@@ -41,18 +43,32 @@
                         {% if match.winner %}{{ match.winner.name }}{% else %}N/A{% endif %}
                     </td>
 
-                    <!-- Date -->
-                    <td style="padding: 10px; border: 1px solid #ccc;">{{ match.date|date:"Y-m-d" }}</td>
+                    <!-- Day Number -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% if match.day_number > 0 %}
+                            Day {{ match.day_number }}
+                        {% else %}
+                            Unassigned
+                        {% endif %}
+                    </td>
+
+                    <!-- Game -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% if match.game %}{{ match.game.name }}{% else %}N/A{% endif %}
+                    </td>
+
+                    <!-- PPV Event -->
+                    <td style="padding: 10px; border: 1px solid #ccc;">
+                        {% if match.ppv_event %}{{ match.ppv_event.name }}{% else %}N/A{% endif %}
+                    </td>
 
                     <!-- Actions -->
                     <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">
-                        <!-- Auto Decide Winner Button -->
                         {% if not match.winner %}
                             <a href="{% url 'matches:auto_decide_winner' match.id %}" title="Auto Decide Winner" style="color: #28a745; text-decoration: none; font-size: 18px; margin-right: 10px;">
                                 🎲
                             </a>
                         {% endif %}
-                        <!-- Delete Button -->
                         <a href="{% url 'matches:delete_match' match.id %}" title="Delete Match" style="color: #dc3545; text-decoration: none; font-size: 18px;">
                             🗑
                         </a>
@@ -60,13 +76,13 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5" style="padding: 10px; text-align: center;">No matches found.</td>
+                    <td colspan="7" style="padding: 10px; text-align: center;">No matches found.</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Pagination remains unchanged -->
+    <!-- Pagination -->
     <div style="text-align: center; margin: 20px; color: #333;">
         <span>
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
@@ -88,42 +104,66 @@
         </div>
     </div>
 
-    <!-- Add Match Modal remains unchanged -->
-    <div class="modal fade" id="addMatchModal" tabindex="-1" aria-labelledby="addMatchModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{% url 'matches:add_match' %}" method="POST">
-                    {% csrf_token %}
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addMatchModalLabel">Add New Match</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Add Match Modal -->
+    <!-- Add Match Modal -->
+<div class="modal fade" id="addMatchModal" tabindex="-1" aria-labelledby="addMatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{% url 'matches:add_match' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMatchModalLabel">Add New Match</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="matchType" class="form-label">Match Type</label>
+                        <select class="form-select" id="matchType" name="match_type" required>
+                            {% for key, value in match.MATCH_TYPES %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="matchType" class="form-label">Match Type</label>
-                            <select class="form-select" id="matchType" name="match_type" required>
-                                {% for key, value in match.MATCH_TYPES %}
-                                    <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="participants" class="form-label">Select Participants</label>
-                            <select class="form-select" id="participants" name="participants" multiple required>
-                                {% for wrestler in all_wrestlers %}
-                                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-text">Hold down the Ctrl (Windows) / Command (Mac) key to select multiple options.</div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="participants" class="form-label">Select Participants</label>
+                        <select class="form-select" id="participants" name="participants" multiple required>
+                            {% for wrestler in all_wrestlers %}
+                                <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Hold down the Ctrl (Windows) / Command (Mac) key to select multiple options.</div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Add Match</button>
+                    <div class="mb-3">
+                        <label for="dayNumber" class="form-label">Day Number (optional)</label>
+                        <input type="number" class="form-control" id="dayNumber" name="day_number" min="0" value="0">
+                        <div class="form-text">Enter 0 or leave blank for unassigned matches.</div>
                     </div>
-                </form>
-            </div>
+                    <div class="mb-3">
+                        <label for="game" class="form-label">Game (optional)</label>
+                        <select class="form-select" id="game" name="game">
+                            <option value="">None</option>
+                            {% for game in request.user.games.all %}
+                                <option value="{{ game.id }}">{{ game.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ppvEvent" class="form-label">PPV Event (optional)</label>
+                        <select class="form-select" id="ppvEvent" name="ppv_event">
+                            <option value="">None</option>
+                            {% for ppv in request.user.games.all.0.ppv_events.all %}
+                                <option value="{{ ppv.id }}">{{ ppv.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Match</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
 {% endblock %}
