@@ -4,9 +4,9 @@
 <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <div style="position: relative; margin-bottom: 20px;">
         <h2 style="text-align: center; color: #fff;">{{ game.name }}</h2>
-        <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" style="position: absolute; top: 0; right: 0;">
+        <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" style="position: absolute; top: 0; right: 0;" id="remove-game-form">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this game? This action cannot be undone.');">
+            <button type="submit" class="btn btn-danger btn-sm" id="remove-game-btn">
                 Remove Game
             </button>
         </form>
@@ -34,7 +34,6 @@
         </ul>
     </nav>
 
-    <!-- Конкретното съдържание на всяка страница -->
     {% block game_content %}
     <div style="max-width: 800px; margin: 20px auto; color: #fff;">
         <h3>Current Day: Day {{ game.current_day }}</h3>
@@ -54,4 +53,26 @@
     </div>
     {% endblock %}
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('remove-game-btn').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to remove this game? This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('remove-game-form').submit();
+        }
+    });
+});
+</script>
 {% endblock %}
