@@ -4,11 +4,38 @@
 <div style="color: #fff;">
     <h3>Championships in {{ game.name }}</h3>
     {% if championships %}
-        <ul>
-            {% for championship in championships %}
-                <li>{{ championship.name }} - Current Champion: {{ championship.current_champion|default:"Vacant" }}</li>
-            {% endfor %}
-        </ul>
+        {% for championship in championships %}
+            <div style="margin-bottom: 30px;">
+                <h4>{{ championship.name }} ({{ championship.gender|capfirst }} - {% if championship.is_single %}Singles{% else %}Tag Team{% endif %})</h4>
+                <p>Current Champion: {{ championship.current_champion|default:"Vacant" }}</p>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background-color: #333; border-bottom: 2px solid #fff;">
+                            <th style="padding: 10px; text-align: left;">Champion</th>
+                            <th style="padding: 10px; text-align: left;">Times Won</th>
+                            <th style="padding: 10px; text-align: left;">Date Won</th>
+                            <th style="padding: 10px; text-align: left;">Date Lost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for history in championship.history.all %}
+                            <tr style="border-bottom: 1px solid #555;">
+                                <td style="padding: 10px;">{{ history.wrestler.name }}</td>
+                                <td style="padding: 10px;">{{ history.reign_number }}</td>
+                                <td style="padding: 10px;">{{ history.date_won }}</td>
+                                <td style="padding: 10px;">{{ history.date_lost|default:"Still Champion" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" style="padding: 10px; text-align: center;">
+                                    No championship history yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
     {% else %}
         <p>No championships available.</p>
     {% endif %}

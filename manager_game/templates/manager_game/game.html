@@ -4,12 +4,6 @@
 <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <div style="position: relative; margin-bottom: 20px;">
         <h2 style="text-align: center; color: #fff;">{{ game.name }}</h2>
-        <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" style="position: absolute; top: 0; right: 0;" id="remove-game-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm" id="remove-game-btn">
-                Remove Game
-            </button>
-        </form>
     </div>
 
     <!-- Календар -->
@@ -31,32 +25,46 @@
             <li><a href="{% url 'manager_game:game_brands' game.id %}" class="btn btn-outline-light">Brands</a></li>
             <li><a href="{% url 'manager_game:power_rankings' game.id %}" class="btn btn-outline-light">Power Rankings</a></li>
             <li><a href="{% url 'manager_game:championships' game.id %}" class="btn btn-outline-light">Championships</a></li>
+            <li><a href="{% url 'manager_game:rivalries' game.id %}" class="btn btn-outline-light">Rivalries</a></li>
+            <li><a href="{% url 'manager_game:options' game.id %}" class="btn btn-outline-light">Options</a></li>
         </ul>
     </nav>
 
     {% block game_content %}
     <div style="max-width: 800px; margin: 20px auto; color: #fff;">
-        <h3>Current Day: Day {{ game.current_day }}</h3>
-        <p>Event: {{ current_event }}</p>
-        {% if current_event_type == 'PPV' and not current_ppv.completed %}
-            <a href="{% url 'manager_game:simulate_ppv' game.id current_ppv.id %}" class="btn btn-success">Simulate PPV</a>
+        {% if request.path == '/manager/game/'|add:game.id|add:'/options/' %}
+            <h3>Game Options</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
+                <button class="btn btn-outline-light">Edit Game Settings</button>
+                <button class="btn btn-outline-light">Export Game Data</button>
+                <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" id="remove-game-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" id="remove-game-btn">Remove Game</button>
+                </form>
+            </div>
+        {% else %}
+            <h3>Current Day: Day {{ game.current_day }}</h3>
+            <p>Event: {{ current_event }}</p>
+            {% if current_event_type == 'PPV' and not current_ppv.completed %}
+                <a href="{% url 'manager_game:simulate_ppv' game.id current_ppv.id %}" class="btn btn-success">Simulate PPV</a>
+            {% endif %}
+            {% if error_message %}
+                <div class="alert alert-danger" style="margin-top: 10px;">{{ error_message }}</div>
+            {% endif %}
+            <form method="POST" action="{% url 'manager_game:next_day' game.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;" {% if not day_completed %}disabled{% endif %}>
+                    Next Day
+                </button>
+            </form>
         {% endif %}
-        {% if error_message %}
-            <div class="alert alert-danger" style="margin-top: 10px;">{{ error_message }}</div>
-        {% endif %}
-        <form method="POST" action="{% url 'manager_game:next_day' game.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary" style="margin-top: 10px;" {% if not day_completed %}disabled{% endif %}>
-                Next Day
-            </button>
-        </form>
     </div>
     {% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.getElementById('remove-game-btn').addEventListener('click', function(event) {
+document.getElementById('remove-game-btn')?.addEventListener('click', function(event) {
     event.preventDefault();
 
     Swal.fire({

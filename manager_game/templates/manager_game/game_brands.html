@@ -4,11 +4,35 @@
 <div style="color: #fff;">
     <h3>Brands in {{ game.name }}</h3>
     {% if brands %}
-        <ul>
-            {% for brand in brands %}
-                <li>{{ brand.name }} - {{ brand.wrestler_links.count }} wrestlers</li>
-            {% endfor %}
-        </ul>
+        {% for brand in brands %}
+            <div style="margin-bottom: 30px;">
+                <h4>{{ brand.name }} ({{ brand.wrestler_links.count }} wrestlers)</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background-color: #333; border-bottom: 2px solid #fff;">
+                            <th style="padding: 10px; text-align: left;">Wrestler Name</th>
+                            <th style="padding: 10px; text-align: left;">Brand Rating</th>
+                            <th style="padding: 10px; text-align: left;">Gender</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for wrestler_link in brand.wrestler_links.all %}
+                            <tr style="border-bottom: 1px solid #555;">
+                                <td style="padding: 10px;">{{ wrestler_link.wrestler.name }}</td>
+                                <td style="padding: 10px;">{{ wrestler_link.brand_rating }}</td>
+                                <td style="padding: 10px;">{{ wrestler_link.wrestler.gender|capfirst }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" style="padding: 10px; text-align: center;">
+                                    No wrestlers in this brand yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
     {% else %}
         <p>No brands available.</p>
     {% endif %}
