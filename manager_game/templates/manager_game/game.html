@@ -3,7 +3,9 @@
 {% block content %}
 <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <div style="position: relative; margin-bottom: 20px;">
-        <h2 style="text-align: center; color: #fff;">{{ game.name }}</h2>
+        <h2 style="text-align: center; color: #fff;">
+            <a href="{% url 'manager_game:options' game.id %}" style="color: #fff; text-decoration: none;">{{ game.name }}</a>
+        </h2>
     </div>
 
     <!-- Календар -->
@@ -35,7 +37,8 @@
         {% if request.path == '/manager/game/'|add:game.id|add:'/options/' %}
             <h3>Game Options</h3>
             <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
-                <button class="btn btn-outline-light">Edit Game Settings</button>
+                <button class="btn btn-outline-light">Edit Game</button>
+                <button class="btn btn-outline-light">Reset Game</button>
                 <button class="btn btn-outline-light">Export Game Data</button>
                 <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" id="remove-game-form">
                     {% csrf_token %}
