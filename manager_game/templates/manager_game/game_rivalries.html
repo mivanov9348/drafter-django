@@ -1,7 +1,213 @@
 {% extends 'manager_game/game.html' %}
+
 {% block game_content %}
 <div style="max-width: 800px; margin: 20px auto; color: #fff;">
     <h3>Rivalries in {{ game.name }}</h3>
-    <p>Rivalries content coming soon!</p>
+
+    <!-- Бутон за добавяне на съперничество -->
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRivalryModal">
+            Add Rivalry
+        </button>
+    </div>
+
+    {% for brand, rivalries in rivalries_by_brand.items %}
+        <h4>{{ brand.name }}</h4>
+        {% if rivalries %}
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th>Wrestler 1</th>
+                        <th>Wrestler 2</th>
+                        <th>Status</th>
+                        <th>Winner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rivalry in rivalries %}
+                        <tr>
+                            <td>{{ rivalry.wrestler_one.name }}</td>
+                            <td>{{ rivalry.wrestler_two.name }}</td>
+                            <td>{{ rivalry.completed|yesno:"Completed,Active" }}</td>
+                            <td>{{ rivalry.winner.name|default:"N/A" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Пагинация за всеки бранд -->
+            <div style="text-align: center; margin: 20px;">
+                <span style="color: #fff;">
+                    Page {{ rivalries.number }} of {{ rivalries.paginator.num_pages }}
+                </span>
+                <div style="margin-top: 10px;">
+                    {% if rivalries.has_previous %}
+                        <a href="?page_{{ brand.id }}={{ rivalries.previous_page_number }}" style="margin-right: 10px; color: #007bff;">« Previous</a>
+                    {% endif %}
+                    {% for num in rivalries.paginator.page_range %}
+                        {% if rivalries.number == num %}
+                            <strong style="color: #fff; margin: 0 5px;">{{ num }}</strong>
+                        {% else %}
+                            <a href="?page_{{ brand.id }}={{ num }}" style="margin: 0 5px; color: #007bff;">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if rivalries.has_next %}
+                        <a href="?page_{{ brand.id }}={{ rivalries.next_page_number }}" style="margin-left: 10px; color: #007bff;">Next »</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p>No rivalries scheduled yet for {{ brand.name }}.</p>
+        {% endif %}
+    {% empty %}
+        <p>No brands available in this game.</p>
+    {% endfor %}
+
+    <!-- Модал за добавяне на съперничество -->
+    <div class="modal fade" id="addRivalryModal" tabindex="-1" aria-labelledby="addRivalryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addRivalryForm" method="POST" action="{% url 'manager_game:game_rivalries' game.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addRivalryModalLabel">Add New Rivalry</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="brand" class="form-label">Brand</label>
+                            <select class="form-select" id="brand" name="brand" required onchange="updateWrestlers()">
+                                {% for brand in brands %}
+                                    <option value="{{ brand.id }}">{{ brand.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="wrestlerOne" class="form-label">Wrestler 1</label>
+                            <select class="form-select" id="wrestlerOne" name="wrestler_one" required>
+                                <!-- Опциите ще се попълнят с JavaScript -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="wrestlerTwo" class="form-label">Wrestler 2</label>
+                            <select class="form-select" id="wrestlerTwo" name="wrestler_two" required>
+                                <!-- Опциите ще се попълнят с JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Rivalry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Данни за кечистите по брандове с информация за пола
+    const wrestlersByBrand = {
+        {% for brand in brands %}
+            "{{ brand.id }}": [
+                {% for wb in brand.wrestler_links.all %}
+                    {"id": "{{ wb.wrestler.id }}", "name": "{{ wb.wrestler.name }}", "gender": "{{ wb.wrestler.gender }}"},
+                {% endfor %}
+            ],
+        {% endfor %}
+    };
+
+    function updateWrestlers() {
+        const brandId = document.getElementById('brand').value;
+        const wrestlers = wrestlersByBrand[brandId] || [];
+        const wrestlerOneSelect = document.getElementById('wrestlerOne');
+        const wrestlerTwoSelect = document.getElementById('wrestlerTwo');
+
+        wrestlerOneSelect.innerHTML = '';
+        wrestlerTwoSelect.innerHTML = '';
+
+        wrestlers.forEach(wrestler => {
+            const option1 = document.createElement('option');
+            option1.value = wrestler.id;
+            option1.text = wrestler.name;
+            option1.dataset.gender = wrestler.gender;
+            wrestlerOneSelect.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = wrestler.id;
+            option2.text = wrestler.name;
+            option2.dataset.gender = wrestler.gender;
+            wrestlerTwoSelect.appendChild(option2);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateWrestlers();
+    });
+
+    document.getElementById('addRivalryForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const form = this;
+        const wrestlerOne = document.getElementById('wrestlerOne');
+        const wrestlerTwo = document.getElementById('wrestlerTwo');
+        const wrestlerOneGender = wrestlerOne.options[wrestlerOne.selectedIndex].dataset.gender;
+        const wrestlerTwoGender = wrestlerTwo.options[wrestlerTwo.selectedIndex].dataset.gender;
+
+        // Клиентска проверка за еднакви кечисти и различен пол
+        if (wrestlerOne.value === wrestlerTwo.value) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'A rivalry must involve two different wrestlers.'
+            });
+            return;
+        }
+        if (wrestlerOneGender !== wrestlerTwoGender) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Rivalries between male and female wrestlers are not allowed.'
+            });
+            return;
+        }
+
+        // Изпращане на формата чрез AJAX
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload(); // Презареждаме страницата при успех
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'An error occurred while creating the rivalry.'
+            });
+        });
+    });
+</script>
 {% endblock %}

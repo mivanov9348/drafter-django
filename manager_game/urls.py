@@ -15,9 +15,9 @@ urlpatterns = [
     path('<int:game_id>/brands/', views.game_brands, name='game_brands'),
     path('<int:game_id>/power-rankings/', views.power_rankings, name='power_rankings'),
     path('<int:game_id>/championships/', views.championships, name='championships'),
-    path('<int:game_id>/rivalries/', views.rivalries, name='rivalries'),
     path('<int:game_id>/options/', views.options, name='options'),
     path('<int:game_id>/edit/', views.edit_game, name='edit_game'),
     path('<int:game_id>/reset/', views.reset_game, name='reset_game'),
+    path('<int:game_id>/rivalries/', views.game_rivalries, name='game_rivalries'),
 
 ]
