@@ -33,57 +33,6 @@
     </nav>
 
     {% block game_content %}
-    <div style="max-width: 800px; margin: 20px auto; color: #fff;">
-        {% if request.path == '/manager/game/'|add:game.id|add:'/options/' %}
-            <h3>Game Options</h3>
-            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
-                <button class="btn btn-outline-light">Edit Game</button>
-                <button class="btn btn-outline-light">Reset Game</button>
-                <button class="btn btn-outline-light">Export Game Data</button>
-                <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" id="remove-game-form">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger" id="remove-game-btn">Remove Game</button>
-                </form>
-            </div>
-        {% else %}
-            <h3>Current Day: Day {{ game.current_day }}</h3>
-            <p>Event: {{ current_event }}</p>
-            {% if current_event_type == 'PPV' and not current_ppv.completed %}
-                <a href="{% url 'manager_game:simulate_ppv' game.id current_ppv.id %}" class="btn btn-success">Simulate PPV</a>
-            {% endif %}
-            {% if error_message %}
-                <div class="alert alert-danger" style="margin-top: 10px;">{{ error_message }}</div>
-            {% endif %}
-            <form method="POST" action="{% url 'manager_game:next_day' game.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary" style="margin-top: 10px;" {% if not day_completed %}disabled{% endif %}>
-                    Next Day
-                </button>
-            </form>
-        {% endif %}
-    </div>
     {% endblock %}
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.getElementById('remove-game-btn')?.addEventListener('click', function(event) {
-    event.preventDefault();
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you really want to remove this game? This action cannot be undone!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('remove-game-form').submit();
-        }
-    });
-});
-</script>
 {% endblock %}
