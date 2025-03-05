@@ -10,22 +10,24 @@
                     <th>Rank</th>
                     <th>Wrestler</th>
                     <th>Wins</th>
-                    <th>Rating</th>
+                    <th>Points</th>
+                    <!-- <th>Rating</th> --> <!-- Optional -->
                 </tr>
             </thead>
             <tbody>
-                {% for wrestler in wrestlers %}
+                {% for stats in wrestlers %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ wrestler.name }}</td>
-                        <td>{{ wrestler.wins.count }}</td>
-                        <td>{{ wrestler.overall_rating }}</td>
+                        <td>{{ stats.wrestler.name }}</td>
+                        <td>{{ stats.wins }}</td>
+                        <td>{{ stats.points }}</td>
+                        <!-- <td>{{ stats.wrestler.overall_rating }}</td> --> <!-- Optional -->
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>No wrestler data available.</p>
+        <p>No wrestler data available for this game.</p>
     {% endif %}
 </div>
 {% endblock %}

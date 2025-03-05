@@ -27,3 +27,16 @@ class WrestlerBrand(models.Model):
 
     def __str__(self):
         return f"{self.wrestler.name} in {self.brand.name}"
+
+
+class WrestlerGameStats(models.Model):
+    game = models.ForeignKey('manager_game.Game', on_delete=models.CASCADE, related_name='wrestler_stats')
+    wrestler = models.ForeignKey('wrestler.Wrestler', on_delete=models.CASCADE, related_name='game_stats')
+    points = models.PositiveIntegerField(default=0)
+    wins = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('game', 'wrestler')
+
+    def __str__(self):
+        return f"{self.wrestler.name} in {self.game.name} - {self.points} points"
