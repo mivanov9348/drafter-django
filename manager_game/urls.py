@@ -21,5 +21,6 @@ urlpatterns = [
     path('<int:game_id>/reset/', views.reset_game, name='reset_game'),
     path('<int:game_id>/rivalries/', views.game_rivalries, name='game_rivalries'),
     path('<int:game_id>/rivalries/<int:rivalry_id>/delete/', views.delete_rivalry, name='delete_rivalry'),
-    path('<int:game_id>/dashboard/simulate_day/', views.simulate_day, name='simulate_day'),  # Simulate Day
+    path('<int:game_id>/dashboard/simulate_match/<int:match_id>/', views.simulate_match, name='simulate_match'),
+    path('<int:game_id>/dashboard/simulate_day/', views.simulate_day, name='simulate_day')
 ]

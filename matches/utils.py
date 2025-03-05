@@ -1,10 +1,90 @@
 from django.db import transaction
 from datetime import timedelta
 import random
-
 from matches.models import Match
 from wrestler.models import Wrestler, WrestlerBrand
 
+
+def generate_matches_for_day(game, day_number):
+    """Helper function to generate matches for a specific day."""
+    brands = list(game.brands.all())
+    ppv_events = list(game.ppv_events.all().order_by('date'))
+    num_brands = len(brands)
+    cycle_length = num_brands + 1
+    num_ppv = len(ppv_events)
+
+    position = (day_number - 1) % cycle_length
+    match_types = ['singles', 'triple_threat', 'fatal_four_way', 'ladder_match']
+
+    if position < num_brands:
+        # Brand day
+        current_brand = brands[position]
+        # Get wrestlers for the current brand only
+        wrestler_brands = WrestlerBrand.objects.filter(brand=current_brand)
+        all_wrestlers = Wrestler.objects.filter(brand_links__in=wrestler_brands).distinct()
+
+        # Separate male and female wrestlers
+        male_wrestlers = list(all_wrestlers.filter(gender='male'))
+        female_wrestlers = list(all_wrestlers.filter(gender='female'))
+
+        num_matches = random.randint(3, 5)  # Generate 3-5 matches for the brand
+        for _ in range(num_matches):
+            # Randomly choose gender pool for this match
+            wrestlers_pool = random.choice(
+                [male_wrestlers, female_wrestlers]) if male_wrestlers and female_wrestlers else (
+                        male_wrestlers or female_wrestlers)
+            if not wrestlers_pool:  # Skip if no wrestlers available
+                continue
+
+            num_participants = random.choice([2, 3, 4])
+            available_participants = min(num_participants, len(wrestlers_pool))
+            if available_participants < 2:  # Need at least 2 participants
+                continue
+
+            participants = random.sample(wrestlers_pool, available_participants)
+            match = Match.objects.create(
+                user=game.user,
+                game=game,
+                match_type=random.choice(match_types),
+                day_number=day_number,
+                brand=current_brand
+            )
+            match.participants.set(participants)
+    else:
+        # PPV day
+        ppv_index = ((day_number - 1) // cycle_length) % num_ppv
+        current_ppv = ppv_events[ppv_index]
+        # For PPV, allow wrestlers from all brands but still separate by gender
+        all_wrestlers = list(game.wrestlers.all())
+
+        # Separate male and female wrestlers
+        male_wrestlers = [w for w in all_wrestlers if w.gender == 'male']
+        female_wrestlers = [w for w in all_wrestlers if w.gender == 'female']
+
+        num_matches = random.randint(4, 6)  # More matches for PPV
+        for _ in range(num_matches):
+            # Randomly choose gender pool for this match
+            wrestlers_pool = random.choice(
+                [male_wrestlers, female_wrestlers]) if male_wrestlers and female_wrestlers else (
+                        male_wrestlers or female_wrestlers)
+            if not wrestlers_pool:  # Skip if no wrestlers available
+                continue
+
+            num_participants = random.choice([2, 3, 4])
+            available_participants = min(num_participants, len(wrestlers_pool))
+            if available_participants < 2:  # Need at least 2 participants
+                continue
+
+            participants = random.sample(wrestlers_pool, available_participants)
+            match = Match.objects.create(
+                user=game.user,
+                game=game,
+                match_type=random.choice(match_types),
+                day_number=day_number,
+                ppv_event=current_ppv,
+                brand=random.choice(brands) if brands else None
+            )
+            match.participants.set(participants)
 
 def distribute_matches_for_brands(game, brands, calendar, user):
     num_brands = len(brands)
