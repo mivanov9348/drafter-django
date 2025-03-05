@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2 style="text-align: center; margin-top: 20px; color: #fff;">Create New Game</h2>
-    <form method="POST" style="max-width: 800px; margin: 20px auto;">
+    <form method="POST" style="max-width: 800px; margin: 20px auto;" id="create-game-form">
         {% csrf_token %}
         <div class="mb-3">
             <label for="game_name" class="form-label" style="color: #fff;">Game Name</label>
@@ -25,14 +25,53 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label" style="color: #fff;">Select 12 PPV Names</label>
-            {% for ppv in default_ppv_names %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="ppv_names" value="{{ ppv }}" id="ppv_{{ forloop.counter }}">
-                    <label class="form-check-label" for="ppv_{{ forloop.counter }}" style="color: #fff;">{{ ppv }}</label>
+            <label class="form-label" style="color: #fff;">Order Your PPV Events (1st to 12th)</label>
+            {% for i in "123456789abc" %}
+                <div class="row mb-2">
+                    <div class="col-2">
+                        <label class="form-label" style="color: #fff;">PPV #{{ forloop.counter }}</label>
+                    </div>
+                    <div class="col-10">
+                        <select class="form-select ppv-select" name="ppv_names_{{ forloop.counter }}" required>
+                            <option value="" disabled selected>Select a PPV</option>
+                            {% for ppv in default_ppv_names %}
+                                <option value="{{ ppv }}">{{ ppv }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             {% endfor %}
         </div>
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
         <button type="submit" class="btn btn-primary">Create Game</button>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selects = document.querySelectorAll('.ppv-select');
+
+            selects.forEach(select => {
+                select.addEventListener('change', function () {
+                    const selectedValues = Array.from(selects)
+                        .map(sel => sel.value)
+                        .filter(val => val !== '');
+
+                    selects.forEach(sel => {
+                        const options = sel.querySelectorAll('option');
+                        options.forEach(option => {
+                            if (option.value && option.value !== sel.value && selectedValues.includes(option.value)) {
+                                option.disabled = true;
+                            } else if (option.value) {
+                                option.disabled = false;
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock %}

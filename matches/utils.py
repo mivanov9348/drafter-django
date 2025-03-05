@@ -14,38 +14,51 @@ def generate_matches_for_day(game, day_number):
     num_ppv = len(ppv_events)
 
     position = (day_number - 1) % cycle_length
-    match_types = ['singles', 'triple_threat', 'fatal_four_way', 'ladder_match']
+    match_types = ['singles', 'triple_threat', 'fatal_four_way', 'ladder_match', 'hell_in_a_cell']
+    # 'royal_rumble' excluded from random selection due to its unique size requirement
+
+    participant_requirements = {
+        'singles': 2,
+        'triple_threat': 3,
+        'fatal_four_way': 4,
+        'ladder_match': 2,  # Can have more, but 2 is minimum
+        'hell_in_a_cell': 2,
+        'royal_rumble': 30,
+    }
 
     if position < num_brands:
         # Brand day
         current_brand = brands[position]
-        # Get wrestlers for the current brand only
         wrestler_brands = WrestlerBrand.objects.filter(brand=current_brand)
         all_wrestlers = Wrestler.objects.filter(brand_links__in=wrestler_brands).distinct()
 
-        # Separate male and female wrestlers
         male_wrestlers = list(all_wrestlers.filter(gender='male'))
         female_wrestlers = list(all_wrestlers.filter(gender='female'))
 
-        num_matches = random.randint(3, 5)  # Generate 3-5 matches for the brand
+        num_matches = random.randint(3, 5)
         for _ in range(num_matches):
-            # Randomly choose gender pool for this match
             wrestlers_pool = random.choice(
                 [male_wrestlers, female_wrestlers]) if male_wrestlers and female_wrestlers else (
-                        male_wrestlers or female_wrestlers)
-            if not wrestlers_pool:  # Skip if no wrestlers available
+                    male_wrestlers or female_wrestlers)
+            if not wrestlers_pool:
                 continue
 
-            num_participants = random.choice([2, 3, 4])
-            available_participants = min(num_participants, len(wrestlers_pool))
-            if available_participants < 2:  # Need at least 2 participants
+            # Filter match types based on available wrestlers
+            max_participants = len(wrestlers_pool)
+            valid_match_types = [
+                mt for mt in match_types if participant_requirements[mt] <= max_participants
+            ]
+            if not valid_match_types:  # Need at least 2 wrestlers for any match
                 continue
 
-            participants = random.sample(wrestlers_pool, available_participants)
+            match_type = random.choice(valid_match_types)
+            required_participants = participant_requirements[match_type]
+
+            participants = random.sample(wrestlers_pool, required_participants)
             match = Match.objects.create(
                 user=game.user,
                 game=game,
-                match_type=random.choice(match_types),
+                match_type=match_type,
                 day_number=day_number,
                 brand=current_brand
             )
@@ -54,32 +67,37 @@ def generate_matches_for_day(game, day_number):
         # PPV day
         ppv_index = ((day_number - 1) // cycle_length) % num_ppv
         current_ppv = ppv_events[ppv_index]
-        # For PPV, allow wrestlers from all brands but still separate by gender
         all_wrestlers = list(game.wrestlers.all())
 
-        # Separate male and female wrestlers
         male_wrestlers = [w for w in all_wrestlers if w.gender == 'male']
         female_wrestlers = [w for w in all_wrestlers if w.gender == 'female']
 
-        num_matches = random.randint(4, 6)  # More matches for PPV
+        num_matches = random.randint(4, 6)
+        # Add a chance for a Royal Rumble on PPV if enough wrestlers
+        ppv_match_types = match_types + (['royal_rumble'] if len(all_wrestlers) >= 30 else [])
+
         for _ in range(num_matches):
-            # Randomly choose gender pool for this match
             wrestlers_pool = random.choice(
                 [male_wrestlers, female_wrestlers]) if male_wrestlers and female_wrestlers else (
-                        male_wrestlers or female_wrestlers)
-            if not wrestlers_pool:  # Skip if no wrestlers available
+                    male_wrestlers or female_wrestlers)
+            if not wrestlers_pool:
                 continue
 
-            num_participants = random.choice([2, 3, 4])
-            available_participants = min(num_participants, len(wrestlers_pool))
-            if available_participants < 2:  # Need at least 2 participants
+            max_participants = len(wrestlers_pool)
+            valid_match_types = [
+                mt for mt in ppv_match_types if participant_requirements[mt] <= max_participants
+            ]
+            if not valid_match_types:
                 continue
 
-            participants = random.sample(wrestlers_pool, available_participants)
+            match_type = random.choice(valid_match_types)
+            required_participants = participant_requirements[match_type]
+
+            participants = random.sample(wrestlers_pool, required_participants)
             match = Match.objects.create(
                 user=game.user,
                 game=game,
-                match_type=random.choice(match_types),
+                match_type=match_type,
                 day_number=day_number,
                 ppv_event=current_ppv,
                 brand=random.choice(brands) if brands else None
