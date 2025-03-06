@@ -1,3 +1,10 @@
+import random
+
+from manager_game.models import Rivalry
+from matches.models import Match
+from wrestler.models import Wrestler, WrestlerBrand
+
+
 def get_game_days(game):
     brands = list(game.brands.all())
     ppv_events = list(game.ppv_events.all().order_by('date'))
@@ -17,3 +24,4 @@ def get_game_days(game):
         days.append({'day_number': day_number, 'event': event})
 
     return days
+
