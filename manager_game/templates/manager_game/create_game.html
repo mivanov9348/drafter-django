@@ -41,6 +41,8 @@
                     </div>
                 </div>
             {% endfor %}
+            <!-- Automatic PPV Order button -->
+            <button type="button" class="btn btn-secondary mt-2" id="auto-ppv-btn">Auto Fill PPV</button>
         </div>
         {% if error %}
             <div class="alert alert-danger" role="alert">
@@ -53,7 +55,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const selects = document.querySelectorAll('.ppv-select');
+            const autoPpvBtn = document.getElementById('auto-ppv-btn');
 
+            // Existing logic to disable selected options in other dropdowns
             selects.forEach(select => {
                 select.addEventListener('change', function () {
                     const selectedValues = Array.from(selects)
@@ -70,6 +74,49 @@
                             }
                         });
                     });
+                });
+            });
+
+            // Automatic PPV Order with random selection
+            autoPpvBtn.addEventListener('click', function () {
+                // Get all available PPV names from the template
+                const allPpvNames = [
+                    {% for ppv in default_ppv_names %}
+                        "{{ ppv }}",
+                    {% endfor %}
+                ];
+
+                // Shuffle the array randomly (Fisher-Yates shuffle)
+                for (let i = allPpvNames.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allPpvNames[i], allPpvNames[j]] = [allPpvNames[j], allPpvNames[i]];
+                }
+
+                // Take the first 12 items from the shuffled array
+                const randomPpvOrder = allPpvNames.slice(0, 12);
+
+                // Ensure we have at least 12 PPVs available
+                if (randomPpvOrder.length < 12) {
+                    alert("Error: Not enough PPV events available to select 12.");
+                    return;
+                }
+
+                // Reset all selects to default (empty) state
+                selects.forEach(select => {
+                    select.value = '';
+                    const options = select.querySelectorAll('option');
+                    options.forEach(option => {
+                        if (option.value) {
+                            option.disabled = false; // Re-enable all options
+                        }
+                    });
+                });
+
+                // Fill each select with the random order
+                selects.forEach((select, index) => {
+                    select.value = randomPpvOrder[index];
+                    // Trigger the change event to update the disabled options
+                    select.dispatchEvent(new Event('change'));
                 });
             });
         });
