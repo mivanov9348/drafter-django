@@ -17,16 +17,17 @@ def generate_matches_for_day(game, day_number):
 
     position = (day_number - 1) % cycle_length
     match_types = ['singles', 'triple_threat', 'fatal_four_way', 'ladder_match', 'hell_in_a_cell']
-    # 'royal_rumble' excluded from random selection due to its unique size requirement
-
     participant_requirements = {
         'singles': 2,
         'triple_threat': 3,
         'fatal_four_way': 4,
-        'ladder_match': 2,  # Can have more, but 2 is minimum
+        'ladder_match': 2,
         'hell_in_a_cell': 2,
         'royal_rumble': 30,
     }
+
+    # Множество за проследяване на използваните кечисти за деня
+    used_wrestlers = set()
 
     if position < num_brands:
         # Brand day
@@ -45,18 +46,19 @@ def generate_matches_for_day(game, day_number):
             if not wrestlers_pool:
                 continue
 
-            # Filter match types based on available wrestlers
-            max_participants = len(wrestlers_pool)
+            # Филтрираме само кечисти, които още не са използвани
+            available_wrestlers = [w for w in wrestlers_pool if w not in used_wrestlers]
+            max_participants = len(available_wrestlers)
             valid_match_types = [
                 mt for mt in match_types if participant_requirements[mt] <= max_participants
             ]
-            if not valid_match_types:  # Need at least 2 wrestlers for any match
+            if not valid_match_types:  # Няма достатъчно свободни кечисти
                 continue
 
             match_type = random.choice(valid_match_types)
             required_participants = participant_requirements[match_type]
 
-            participants = random.sample(wrestlers_pool, required_participants)
+            participants = random.sample(available_wrestlers, required_participants)
             match = Match.objects.create(
                 user=game.user,
                 game=game,
@@ -65,6 +67,8 @@ def generate_matches_for_day(game, day_number):
                 brand=current_brand
             )
             match.participants.set(participants)
+            # Добавяме участниците към използваните
+            used_wrestlers.update(participants)
     else:
         # PPV day
         ppv_index = ((day_number - 1) // cycle_length) % num_ppv
@@ -75,7 +79,6 @@ def generate_matches_for_day(game, day_number):
         female_wrestlers = [w for w in all_wrestlers if w.gender == 'female']
 
         num_matches = random.randint(4, 6)
-        # Add a chance for a Royal Rumble on PPV if enough wrestlers
         ppv_match_types = match_types + (['royal_rumble'] if len(all_wrestlers) >= 30 else [])
 
         for _ in range(num_matches):
@@ -85,7 +88,9 @@ def generate_matches_for_day(game, day_number):
             if not wrestlers_pool:
                 continue
 
-            max_participants = len(wrestlers_pool)
+            # Филтрираме само кечисти, които още не са използвани
+            available_wrestlers = [w for w in wrestlers_pool if w not in used_wrestlers]
+            max_participants = len(available_wrestlers)
             valid_match_types = [
                 mt for mt in ppv_match_types if participant_requirements[mt] <= max_participants
             ]
@@ -95,7 +100,7 @@ def generate_matches_for_day(game, day_number):
             match_type = random.choice(valid_match_types)
             required_participants = participant_requirements[match_type]
 
-            participants = random.sample(wrestlers_pool, required_participants)
+            participants = random.sample(available_wrestlers, required_participants)
             match = Match.objects.create(
                 user=game.user,
                 game=game,
@@ -105,12 +110,13 @@ def generate_matches_for_day(game, day_number):
                 brand=random.choice(brands) if brands else None
             )
             match.participants.set(participants)
+            used_wrestlers.update(participants)
 
 
 def generate_ppv_matches(game, ppv_event, day_number):
     """
     Generate matches for a PPV event based on rivalries, brands, and championships.
-    If no rivalries exist, create random matches per brand and championship matches.
+    Each wrestler can participate only once per day.
     Number of matches: random between 5 and 10.
     """
     match_types = ['singles', 'triple_threat', 'fatal_four_way', 'ladder_match', 'hell_in_a_cell']
@@ -120,10 +126,11 @@ def generate_ppv_matches(game, ppv_event, day_number):
     rivalries = Rivalry.objects.filter(game=game, completed=False)
     num_matches = random.randint(5, 10)
 
-    # Step 1: Generate matches based on active rivalries
+    # Множество за проследяване на използваните кечисти
     created_matches = []
-    used_wrestlers = set()  # Set of Wrestler objects
+    used_wrestlers = set()
 
+    # Step 1: Generate matches based on active rivalries
     for rivalry in rivalries:
         if len(created_matches) >= num_matches:
             break
@@ -135,7 +142,7 @@ def generate_ppv_matches(game, ppv_event, day_number):
         match = Match.objects.create(
             user=game.user,
             game=game,
-            match_type='singles',  # Rivalries are typically 1v1
+            match_type='singles',
             day_number=day_number,
             ppv_event=ppv_event,
             brand=rivalry.brand
@@ -145,17 +152,15 @@ def generate_ppv_matches(game, ppv_event, day_number):
         used_wrestlers.add(wrestler_one)
         used_wrestlers.add(wrestler_two)
 
-    # Step 2: If no rivalries or not enough matches, generate brand-based matches
+    # Step 2: Generate brand-based matches
     remaining_matches = num_matches - len(created_matches)
     if remaining_matches > 0 and brands:
         for brand in brands:
             if remaining_matches <= 0:
                 break
             wrestler_brands = WrestlerBrand.objects.filter(brand=brand)
-            # Convert used_wrestlers to a list of IDs
-            used_wrestler_ids = [wrestler.id for wrestler in used_wrestlers]
-            brand_wrestlers = Wrestler.objects.filter(brand_links__in=wrestler_brands).exclude(id__in=used_wrestler_ids)
-            available_wrestlers = list(brand_wrestlers)
+            brand_wrestlers = Wrestler.objects.filter(brand_links__in=wrestler_brands)
+            available_wrestlers = [w for w in brand_wrestlers if w not in used_wrestlers]
             if len(available_wrestlers) >= 2:
                 num_participants = random.choice([2, 3, 4])
                 participants = random.sample(available_wrestlers, min(num_participants, len(available_wrestlers)))
@@ -172,7 +177,7 @@ def generate_ppv_matches(game, ppv_event, day_number):
                 used_wrestlers.update(participants)
                 remaining_matches -= 1
 
-    # Step 3: Add championship matches if not enough matches
+    # Step 3: Add championship matches
     remaining_matches = num_matches - len(created_matches)
     if remaining_matches > 0 and championships:
         for championship in championships:
@@ -181,19 +186,17 @@ def generate_ppv_matches(game, ppv_event, day_number):
             current_champion = championship.current_champion
             if not current_champion or current_champion in used_wrestlers:
                 continue
-            # Convert used_wrestlers to a list of IDs
-            used_wrestler_ids = [wrestler.id for wrestler in used_wrestlers]
             challengers = Wrestler.objects.filter(
                 gender=championship.gender,
                 brand_links__brand__in=brands
-            ).exclude(id__in=used_wrestler_ids).exclude(id=current_champion.id)
-            available_challengers = list(challengers)
+            ).exclude(id__in=[w.id for w in used_wrestlers])
+            available_challengers = [c for c in challengers if c not in used_wrestlers]
             if available_challengers:
                 challenger = random.choice(available_challengers)
                 match = Match.objects.create(
                     user=game.user,
                     game=game,
-                    match_type='singles',  # Championship matches are typically 1v1
+                    match_type='singles',
                     day_number=day_number,
                     ppv_event=ppv_event,
                     brand=random.choice(brands) if brands else None
@@ -204,14 +207,10 @@ def generate_ppv_matches(game, ppv_event, day_number):
                 used_wrestlers.add(challenger)
                 remaining_matches -= 1
 
-    # Step 4: Fill remaining matches with random wrestlers if needed
+    # Step 4: Fill remaining matches with random wrestlers
     remaining_matches = num_matches - len(created_matches)
     if remaining_matches > 0 and wrestlers:
-        # Convert used_wrestlers to a list of IDs
-        used_wrestler_ids = [wrestler.id for wrestler in used_wrestlers]
-        available_wrestlers = Wrestler.objects.filter(id__in=[w.id for w in wrestlers]).exclude(
-            id__in=used_wrestler_ids)
-        available_wrestlers = list(available_wrestlers)
+        available_wrestlers = [w for w in wrestlers if w not in used_wrestlers]
         while remaining_matches > 0 and len(available_wrestlers) >= 2:
             num_participants = random.choice([2, 3, 4])
             participants = random.sample(available_wrestlers, min(num_participants, len(available_wrestlers)))
@@ -227,10 +226,6 @@ def generate_ppv_matches(game, ppv_event, day_number):
             created_matches.append(match)
             used_wrestlers.update(participants)
             remaining_matches -= 1
-            # Update available_wrestlers after adding participants
-            used_wrestler_ids = [wrestler.id for wrestler in used_wrestlers]
-            available_wrestlers = Wrestler.objects.filter(id__in=[w.id for w in wrestlers]).exclude(
-                id__in=used_wrestler_ids)
-            available_wrestlers = list(available_wrestlers)
+            available_wrestlers = [w for w in wrestlers if w not in used_wrestlers]
 
     return created_matches
