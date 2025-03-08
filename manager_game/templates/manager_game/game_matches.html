@@ -13,6 +13,7 @@
                     <th>Winner</th>
                     <th>Brand</th>
                     <th>PPV Event</th>
+                    <th>Championship</th> <!-- Нова колона -->
                 </tr>
             </thead>
             <tbody>
@@ -30,6 +31,13 @@
                         <td>{{ match.winner|default:"N/A" }}</td>
                         <td>{{ match.brand|default:"N/A" }}</td>
                         <td>{{ match.ppv_event|default:"N/A" }}</td>
+                        <td>
+                            {% if match.championship %}
+                                {{ match.championship.name }}
+                            {% else %}
+                                None
+                            {% endif %}
+                        </td> <!-- Показва титлата или "None" -->
                     </tr>
                 {% endfor %}
             </tbody>
