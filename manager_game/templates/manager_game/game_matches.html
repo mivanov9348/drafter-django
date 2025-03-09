@@ -3,6 +3,14 @@
 {% block game_content %}
 <div style="color: #fff;">
     <h3>Matches for {{ game.name }}</h3>
+
+    <!-- Бутон за отваряне на модала за добавяне -->
+    <div style="margin-bottom: 20px;">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMatchModal">
+            Add New Match
+        </button>
+    </div>
+
     {% if matches %}
         <table class="table table-dark">
             <thead>
@@ -13,7 +21,8 @@
                     <th>Winner</th>
                     <th>Brand</th>
                     <th>PPV Event</th>
-                    <th>Championship</th> <!-- Нова колона -->
+                    <th>Championship</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,7 +46,24 @@
                             {% else %}
                                 None
                             {% endif %}
-                        </td> <!-- Показва титлата или "None" -->
+                        </td>
+                        <td>
+                            {% if not match.winner %}
+                                <button type="button" class="btn btn-sm btn-warning edit-match-btn"
+                                        data-bs-toggle="modal" data-bs-target="#editMatchModal"
+                                        data-match-id="{{ match.id }}"
+                                        data-match-type="{{ match.match_type }}"
+                                        data-participants="{% for wrestler in match.participants.all %}{{ wrestler.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                                        data-day-number="{{ match.day_number }}"
+                                        data-brand="{{ match.brand.id|default:'' }}"
+                                        data-ppv-event="{{ match.ppv_event.id|default:'' }}"
+                                        data-championship="{{ match.championship.id|default:'' }}">
+                                    Edit
+                                </button>
+                            {% else %}
+                                <span class="text-muted">Completed</span>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -67,5 +93,227 @@
     {% else %}
         <p>No matches scheduled yet.</p>
     {% endif %}
+
+    <!-- Модал за добавяне на мач -->
+    <div class="modal fade" id="addMatchModal" tabindex="-1" aria-labelledby="addMatchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+                <form method="post" action="{% url 'manager_game:add_match' game.id %}" id="addMatchForm">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMatchModalLabel">Add New Match</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="addMatchType" class="form-label">Match Type</label>
+                            <select class="form-select" id="addMatchType" name="match_type" required>
+                                {% for key, value in match_types %}
+                                    <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addParticipants" class="form-label">Select Participants</label>
+                            <select class="form-select" id="addParticipants" name="participants" multiple required>
+                                {% for wrestler in game.wrestlers.all %}
+                                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Hold Ctrl (Windows) / Cmd (Mac) to select multiple wrestlers.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addDayNumber" class="form-label">Day Number</label>
+                            <input type="number" class="form-control" id="addDayNumber" name="day_number" min="0" value="{{ game.current_day }}" required>
+                            <div class="form-text">Enter the day number for this match (current day: {{ game.current_day }}).</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addBrand" class="form-label">Brand (optional)</label>
+                            <select class="form-select" id="addBrand" name="brand">
+                                <option value="">None</option>
+                                {% for brand in game.brands.all %}
+                                    <option value="{{ brand.id }}">{{ brand.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addPpvEvent" class="form-label">PPV Event (optional)</label>
+                            <select class="form-select" id="addPpvEvent" name="ppv_event">
+                                <option value="">None</option>
+                                {% for ppv in game.ppv_events.all %}
+                                    <option value="{{ ppv.id }}">{{ ppv.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addChampionship" class="form-label">Championship (optional)</label>
+                            <select class="form-select" id="addChampionship" name="championship">
+                                <option value="">None</option>
+                                {% for championship in game.championships.all %}
+                                    <option value="{{ championship.id }}">{{ championship.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Match</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал за редактиране на мач -->
+    <div class="modal fade" id="editMatchModal" tabindex="-1" aria-labelledby="editMatchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+                <form method="post" id="editMatchForm">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editMatchModalLabel">Edit Match</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="match_id" id="editMatchId">
+                        <div class="mb-3">
+                            <label for="editMatchType" class="form-label">Match Type</label>
+                            <select class="form-select" id="editMatchType" name="match_type" required>
+                                {% for key, value in match_types %}
+                                    <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editParticipants" class="form-label">Select Participants</label>
+                            <select class="form-select" id="editParticipants" name="participants" multiple required>
+                                {% for wrestler in game.wrestlers.all %}
+                                    <option value="{{ wrestler.id }}">{{ wrestler.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Hold Ctrl (Windows) / Cmd (Mac) to select multiple wrestlers.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDayNumber" class="form-label">Day Number</label>
+                            <input type="number" class="form-control" id="editDayNumber" name="day_number" min="0" required>
+                            <div class="form-text">Enter the day number for this match.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editBrand" class="form-label">Brand (optional)</label>
+                            <select class="form-select" id="editBrand" name="brand">
+                                <option value="">None</option>
+                                {% for brand in game.brands.all %}
+                                    <option value="{{ brand.id }}">{{ brand.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPpvEvent" class="form-label">PPV Event (optional)</label>
+                            <select class="form-select" id="editPpvEvent" name="ppv_event">
+                                <option value="">None</option>
+                                {% for ppv in game.ppv_events.all %}
+                                    <option value="{{ ppv.id }}">{{ ppv.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editChampionship" class="form-label">Championship (optional)</label>
+                            <select class="form-select" id="editChampionship" name="championship">
+                                <option value="">None</option>
+                                {% for championship in game.championships.all %}
+                                    <option value="{{ championship.id }}">{{ championship.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Bootstrap JS и допълнителен JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Обработка на Add Match Form
+    document.getElementById('addMatchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success) {
+                console.log('Errors:', data.errors);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Попълване на Edit Match Modal
+    document.querySelectorAll('.edit-match-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const matchId = this.getAttribute('data-match-id');
+            const matchType = this.getAttribute('data-match-type');
+            const participants = this.getAttribute('data-participants').split(',').filter(Boolean);
+            const dayNumber = this.getAttribute('data-day-number');
+            const brand = this.getAttribute('data-brand');
+            const ppvEvent = this.getAttribute('data-ppv-event');
+            const championship = this.getAttribute('data-championship');
+
+            document.getElementById('editMatchId').value = matchId;
+            document.getElementById('editMatchType').value = matchType;
+
+            const participantSelect = document.getElementById('editParticipants');
+            Array.from(participantSelect.options).forEach(option => {
+                option.selected = participants.includes(option.value);
+            });
+
+            document.getElementById('editDayNumber').value = dayNumber;
+            document.getElementById('editBrand').value = brand || '';
+            document.getElementById('editPpvEvent').value = ppvEvent || '';
+            document.getElementById('editChampionship').value = championship || '';
+
+            // Задаване на action на формата
+            document.getElementById('editMatchForm').action = "{% url 'manager_game:edit_match' game.id 0 %}".replace('0', matchId);
+        });
+    });
+
+    // Обработка на Edit Match Form
+    document.getElementById('editMatchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success) {
+                console.log('Errors:', data.errors);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
 {% endblock %}
