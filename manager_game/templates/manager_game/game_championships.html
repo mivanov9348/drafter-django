@@ -13,8 +13,8 @@
                         <tr style="background-color: #333; border-bottom: 2px solid #fff;">
                             <th style="padding: 10px; text-align: left;">Champion</th>
                             <th style="padding: 10px; text-align: left;">Times Won</th>
-                            <th style="padding: 10px; text-align: left;">Date Won</th>
-                            <th style="padding: 10px; text-align: left;">Date Lost</th>
+                            <th style="padding: 10px; text-align: left;">Day Won</th>
+                            <th style="padding: 10px; text-align: left;">Day Lost</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -22,8 +22,8 @@
                             <tr style="border-bottom: 1px solid #555;">
                                 <td style="padding: 10px;">{{ history.wrestler.name }}</td>
                                 <td style="padding: 10px;">{{ history.reign_number }}</td>
-                                <td style="padding: 10px;">{{ history.date_won }}</td>
-                                <td style="padding: 10px;">{{ history.date_lost|default:"Still Champion" }}</td>
+                                <td style="padding: 10px;">Day {{ history.day_won }}</td>
+                                <td style="padding: 10px;">{% if history.day_lost %}Day {{ history.day_lost }}{% else %}Still Champion{% endif %}</td>
                             </tr>
                         {% empty %}
                             <tr>
