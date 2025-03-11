@@ -1,0 +1,88 @@
+/* Контейнер за дашборда */
+.dashboard-container {
+    max-width: 800px;
+    margin: 20px auto;
+    color: #fff;
+}
+
+/* Заглавия */
+.dashboard-container h3 {
+    color: #fff;
+}
+
+.dashboard-container h4 {
+    margin-top: 20px;
+    color: #fff;
+}
+
+/* Таблица за мачове */
+.matches-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.matches-table thead tr {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.matches-table th {
+    padding: 10px;
+    text-align: left;
+}
+
+.matches-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.matches-table td {
+    padding: 10px;
+}
+
+/* Форма за симулация */
+.form-simulate {
+    margin-top: 20px;
+}
+
+/* Форма за следващ ден */
+.form-next-day {
+    margin-top: 20px;
+}
+
+/* Стил за бутоните (Bootstrap класовете ще работят, но можем да добавим допълнително) */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.btn-primary:disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Съобщение за грешка */
+.alert-danger {
+    margin-top: 10px;
+    background-color: #dc3545;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}

@@ -1,27 +1,31 @@
 {% extends 'core/dashboard.html' %}
+{% load static %}
 
 {% block content %}
-<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <div style="position: relative; margin-bottom: 20px;">
-        <h2 style="text-align: center; color: #fff;">
-            <a href="{% url 'manager_game:options' game.id %}" style="color: #fff; text-decoration: none;">{{ game.name }}</a>
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/game.css' %}">
+<link rel="stylesheet" href="{% static 'css/game_dashboard.css' %}">
+{% endblock %}
+
+<div class="game-container">
+    <div class="game-header">
+        <h2>
+            <a href="{% url 'manager_game:options' game.id %}">{{ game.name }}</a>
         </h2>
     </div>
 
-    <!-- Календар -->
-    <nav style="max-width: 800px; margin: 20px auto; background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px; overflow-x: auto; white-space: nowrap;">
-        <ul style="list-style: none; padding: 0; display: inline-flex; color: #fff;">
+    <nav class="calendar-nav">
+        <ul>
             {% for day in days %}
-                <li style="padding: 5px 10px; {% if day.day_number == game.current_day %}background-color: rgba(255, 69, 0, 0.8); border-radius: 5px;{% endif %}">
+                <li {% if day.day_number == game.current_day %}class="active-day"{% endif %}>
                     Day {{ day.day_number }}: {{ day.event }}
                 </li>
             {% endfor %}
         </ul>
     </nav>
 
-    <!-- Навигация с бутони -->
-    <nav style="background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-        <ul style="list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; color: #fff;">
+    <nav class="navigation-menu">
+        <ul>
             <li><a href="{% url 'manager_game:game_dashboard' game.id %}" class="btn btn-outline-light">Dashboard</a></li>
             <li><a href="{% url 'manager_game:game_matches' game.id %}" class="btn btn-outline-light">Matches</a></li>
             <li><a href="{% url 'manager_game:game_brands' game.id %}" class="btn btn-outline-light">Brands</a></li>

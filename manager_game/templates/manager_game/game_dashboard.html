@@ -1,39 +1,40 @@
 {% extends 'manager_game/game.html' %}
+{% load static %}
 
 {% block game_content %}
-<div style="max-width: 800px; margin: 20px auto; color: #fff;">
+<div class="dashboard-container">
     <h3>Current Day: Day {{ game.current_day }}</h3>
     <p>Event: {{ current_event }}</p>
 
     <!-- Matches Table -->
-    <h4 style="margin-top: 20px;">Matches for Today</h4>
+    <h4>Matches for Today</h4>
     {% if today_matches %}
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <table class="matches-table">
             <thead>
-                <tr style="background-color: rgba(255, 255, 255, 0.1);">
-                    <th style="padding: 10px; text-align: left;">Match Type</th>
-                    <th style="padding: 10px; text-align: left;">Participants</th>
-                    <th style="padding: 10px; text-align: left;">Winner</th>
-                    <th style="padding: 10px; text-align: left;">Championship</th> <!-- Нова колона -->
+                <tr>
+                    <th>Match Type</th>
+                    <th>Participants</th>
+                    <th>Winner</th>
+                    <th>Championship</th>
                 </tr>
             </thead>
             <tbody>
                 {% for match in today_matches %}
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
-                        <td style="padding: 10px;">{{ match.get_match_type_display }}</td>
-                        <td style="padding: 10px;">
+                    <tr>
+                        <td>{{ match.get_match_type_display }}</td>
+                        <td>
                             {% for participant in match.participants.all %}
                                 {{ participant.name }}{% if not forloop.last %}, {% endif %}
                             {% endfor %}
                         </td>
-                        <td style="padding: 10px;">{{ match.winner.name|default:"-" }}</td>
-                        <td style="padding: 10px;">
+                        <td>{{ match.winner.name|default:"-" }}</td>
+                        <td>
                             {% if match.championship %}
                                 {{ match.championship.name }}
                             {% else %}
                                 -
                             {% endif %}
-                        </td> <!-- Показва титлата или "-" -->
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -41,7 +42,7 @@
 
         <!-- Simulate Day Button -->
         {% if not all_matches_simulated %}
-            <form method="POST" action="{% url 'manager_game:simulate_day' game.id %}" style="margin-top: 20px;">
+            <form method="POST" action="{% url 'manager_game:simulate_day' game.id %}" class="form-simulate">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success">Simulate Day</button>
             </form>
@@ -51,7 +52,7 @@
     {% endif %}
 
     <!-- Next Day Button -->
-    <form method="POST" action="{% url 'manager_game:next_day' game.id %}" style="margin-top: 20px;">
+    <form method="POST" action="{% url 'manager_game:next_day' game.id %}" class="form-next-day">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary" {% if not day_completed %}disabled{% endif %}>
             Next Day
@@ -60,7 +61,7 @@
 
     <!-- Error Message -->
     {% if error_message %}
-        <div class="alert alert-danger" style="margin-top: 10px;">{{ error_message }}</div>
+        <div class="alert alert-danger">{{ error_message }}</div>
     {% endif %}
 </div>
 {% endblock %}

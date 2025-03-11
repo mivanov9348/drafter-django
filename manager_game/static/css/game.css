@@ -1,0 +1,83 @@
+/* Основен контейнер */
+.game-container {
+    padding: 20px;
+    background-image: url('/static/images/game.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    width: 100vw; /* Цялата ширина на екрана */
+    margin: 0;
+}
+
+/* Хедър */
+.game-header {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.game-header h2 {
+    color: #fff;
+}
+
+.game-header a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Календар навигация */
+.calendar-nav {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.calendar-nav ul {
+    list-style: none;
+    padding: 0;
+    display: inline-flex;
+    color: #fff;
+}
+
+.calendar-nav li {
+    padding: 5px 10px;
+}
+
+.calendar-nav .active-day {
+    background-color: rgba(255, 69, 0, 0.8);
+    border-radius: 5px;
+}
+
+/* Навигационно меню */
+.navigation-menu {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.navigation-menu ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    color: #fff;
+}
+
+.navigation-menu li {
+    display: inline-block;
+}
+
+.btn-outline-light {
+    color: #fff;
+    border-color: #fff;
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
