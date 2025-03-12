@@ -5,7 +5,10 @@
     <h3>Game Options for {{ game.name }}</h3>
     <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
         <a href="{% url 'manager_game:edit_game' game.id %}" class="btn btn-outline-light">Edit Game</a>
-        <a href="{% url 'manager_game:reset_game' game.id %}" class="btn btn-outline-light">Reset Game</a>
+        <form method="POST" action="{% url 'manager_game:reset_game' game.id %}" id="reset-game-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light" id="reset-game-btn">Reset Game</button>
+        </form>
         <form method="POST" action="{% url 'manager_game:remove_game' game.id %}" id="remove-game-form">
             {% csrf_token %}
             <button type="submit" class="btn btn-outline-light" id="remove-game-btn">Remove Game</button>
@@ -15,9 +18,26 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+document.getElementById('reset-game-btn').addEventListener('click', function(event) {
+    event.preventDefault();
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This will reset all progress in the game. This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, reset it!',
+        cancelButtonText: 'No, keep it'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('reset-game-form').submit();
+        }
+    });
+});
+
 document.getElementById('remove-game-btn').addEventListener('click', function(event) {
     event.preventDefault();
-
     Swal.fire({
         title: 'Are you sure?',
         text: "Do you really want to remove this game? This action cannot be undone!",
