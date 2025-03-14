@@ -3,7 +3,7 @@
 
 {% block game_content %}
 <div class="dashboard-container">
-    <h3>Season {{ game.season }} - Day {{ game.current_day }}</h3> <!-- Променено тук -->
+    <h3>Season {{ game.season }} - Day {{ game.current_day }}</h3>
     <p>Event: {{ current_event }}</p>
 
     <!-- Matches Table -->
@@ -51,15 +51,21 @@
         <p>No matches scheduled for today.</p>
     {% endif %}
 
-    <!-- Next Day Button -->
-    <form method="POST" action="{% url 'manager_game:next_day' game.id %}" class="form-next-day">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary" {% if not day_completed %}disabled{% endif %}>
-            Next Day
-        </button>
-    </form>
+    <!-- Next Day or Next Season Button -->
+    {% if game.current_day >= total_days_per_season and day_completed %}
+        <form method="POST" action="{% url 'manager_game:next_season' game.id %}" class="form-next-season">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Next Season</button>
+        </form>
+    {% else %}
+        <form method="POST" action="{% url 'manager_game:next_day' game.id %}" class="form-next-day">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" {% if not day_completed %}disabled{% endif %}>
+                Next Day
+            </button>
+        </form>
+    {% endif %}
 
-    <!-- Error Message -->
     {% if error_message %}
         <div class="alert alert-danger">{{ error_message }}</div>
     {% endif %}
