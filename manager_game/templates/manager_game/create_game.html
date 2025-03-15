@@ -16,14 +16,14 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="mb-3">
-            <label class="form-label" style="color: #fff;">Select Championships</label>
-            <select class="form-select" name="championships" multiple>
-                {% for championship in championships %}
-                    <option value="{{ championship.id }}">{{ championship.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+       <div class="mb-3">
+    <label class="form-label" style="color: #fff;">Select Championships</label>
+    <select class="form-select" name="championships" multiple>
+        {% for championship in championships %}
+            <option value="{{ championship.id }}">{{ championship.name }} ({{ championship.get_gender_display }})</option>
+        {% endfor %}
+    </select>
+</div>
         <div class="mb-3">
             <label class="form-label" style="color: #fff;">Order Your PPV Events (1st to 12th)</label>
             {% for i in "123456789abc" %}
