@@ -66,6 +66,131 @@
         .dropdown-item:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .wrestlers-list-container {
+            width: 500px;
+            margin: 0 auto 40px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #444;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .wrestlers-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .wrestler-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #555;
+        }
+        .wrestler-item:last-child {
+            border-bottom: none;
+        }
+        .wrestler-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .wrestler-name {
+            flex: 2;
+            display: flex;
+            align-items: center;
+        }
+        .wrestler-gender { flex: 1; text-align: center; }
+        .wrestler-rating { flex: 1; text-align: right; margin-right: 10px; }
+        .add-wrestler-btn {
+            background: #ff4500;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-wrestler-btn:hover { background: #ff6500; }
+        .add-wrestler-btn:disabled { background: #666; cursor: not-allowed; }
+        .draft-controls {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .draft-controls button {
+            background: #ff4500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .draft-controls button:hover { background: #ff6500; }
+        .draft-controls button:disabled { background: #666; cursor: not-allowed; }
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .brand-card {
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .brand-card.current-turn {
+            border: 2px solid #ff4500;
+        }
+        .brand-card h3 {
+            margin-bottom: 10px;
+            color: #ff4500;
+        }
+        .brand-wrestlers {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+        }
+        .brand-wrestlers li {
+            padding: 5px 0;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .remove-wrestler-btn {
+            background: #d33;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .remove-wrestler-btn:hover {
+            background: #ff4444;
+        }
     </style>
 </head>
 <body>
@@ -132,7 +257,13 @@
                 {% if data.wrestlers %}
                 <ul class="brand-wrestlers">
                     {% for wrestler in data.wrestlers %}
-                    <li>{{ wrestler.name }}</li>
+                    <li>
+                        {{ wrestler.name }}
+                        {% if draft.is_active %}
+                        <button class="remove-wrestler-btn" data-wrestler-id="{{ wrestler.id }}"
+                                data-draft-id="{{ draft.id }}">−</button>
+                        {% endif %}
+                    </li>
                     {% endfor %}
                 </ul>
                 {% endif %}
@@ -142,177 +273,20 @@
             {% endfor %}
         </div>
     </div>
+</div>
 
-    <style>
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            background: #333;
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        p {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .wrestlers-list-container {
-            width: 500px;
-            margin: 0 auto 40px;
-            max-height: 400px;
-            overflow-y: auto;
-            background: #444;
-            border-radius: 8px;
-            padding: 10px;
-        }
-
-        .wrestlers-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .wrestler-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #555;
-        }
-
-        .wrestler-item:last-child {
-            border-bottom: none;
-        }
-
-        .wrestler-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-        }
-
-        .wrestler-name {
-            flex: 2;
-            display: flex;
-            align-items: center;
-        }
-        .wrestler-gender { flex: 1; text-align: center; }
-        .wrestler-rating { flex: 1; text-align: right; margin-right: 10px; }
-
-        .add-wrestler-btn {
-            background: #ff4500;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .add-wrestler-btn:hover { background: #ff6500; }
-        .add-wrestler-btn:disabled { background: #666; cursor: not-allowed; }
-
-        .draft-controls {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .draft-controls button {
-            background: #ff4500;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .draft-controls button:hover { background: #ff6500; }
-        .draft-controls button:disabled { background: #666; cursor: not-allowed; }
-
-        .brands-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .brand-card {
-            background: #222;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .brand-card.current-turn {
-            border: 2px solid #ff4500;
-        }
-
-        .brand-card h3 {
-            margin-bottom: 10px;
-            color: #ff4500;
-        }
-
-        .brand-wrestlers {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0 0;
-        }
-
-        .brand-wrestlers li {
-            padding: 5px 0;
-            border-top: 1px solid #333;
-        }
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.querySelectorAll('.add-wrestler-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const wrestlerId = this.getAttribute('data-wrestler-id');
-                fetch('/draft/add-wrestler/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: `wrestler_id=${wrestlerId}&draft_id={{ draft.id }}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.message || 'Something is Wrong!'
-                        });
-                    }
-                });
-            });
-        });
-
-        {% if draft.is_active %}
-        document.getElementById('auto-pick-btn').addEventListener('click', function() {
-            fetch('/draft/auto-pick/{{ draft.id }}/', {
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelectorAll('.add-wrestler-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const wrestlerId = this.getAttribute('data-wrestler-id');
+            fetch('/draft/add-wrestler/', {
                 method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `wrestler_id=${wrestlerId}&draft_id={{ draft.id }}`
             })
             .then(response => response.json())
             .then(data => {
@@ -330,34 +304,43 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: data.message || 'Something went wrong!'
+                        text: data.message || 'Something is Wrong!'
                     });
                 }
             });
         });
+    });
 
-        document.getElementById('finalize-draft-btn').addEventListener('click', function() {
+    document.querySelectorAll('.remove-wrestler-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const wrestlerId = this.getAttribute('data-wrestler-id');
+            const draftId = this.getAttribute('data-draft-id');
+
             Swal.fire({
-                title: 'Finalize Draft',
-                text: 'Are you sure you want to auto-complete this draft?',
+                title: 'Remove Wrestler',
+                text: 'Are you sure you want to remove this wrestler from their brand?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ff4500',
+                confirmButtonColor: '#d33',
                 cancelButtonColor: '#666',
-                confirmButtonText: 'Yes, finalize!',
+                confirmButtonText: 'Yes, remove!',
                 cancelButtonText: 'No'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/draft/finalize-auto/{{ draft.id }}/', {
+                    fetch(`/draft/remove-wrestler/${draftId}/`, {
                         method: 'POST',
-                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: `wrestler_id=${wrestlerId}`
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Draft Finalized!',
+                                title: 'Removed!',
                                 text: data.message,
                                 showConfirmButton: false,
                                 timer: 1500
@@ -368,62 +351,130 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: data.message || 'Failed to finalize draft!'
+                                text: data.message || 'Failed to remove wrestler!'
                             });
                         }
                     });
                 }
             });
         });
+    });
 
-        document.getElementById('save-draft-btn').addEventListener('click', function() {
-            fetch('/draft/save/{{ draft.id }}/', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Saved!',
-                        text: 'Draft saved successfully!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.message || 'Failed to save draft!'
-                    });
-                }
-            });
-        });
-        {% else %}
-        document.getElementById('edit-draft-btn').addEventListener('click', function() {
-            fetch('/draft/edit/{{ draft.id }}/', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
+    {% if draft.is_active %}
+    document.getElementById('auto-pick-btn').addEventListener('click', function() {
+        fetch('/draft/auto-pick/{{ draft.id }}/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
                     location.reload();
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.message || 'Failed to edit draft!'
-                    });
-                }
-            });
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Something went wrong!'
+                });
+            }
         });
-        {% endif %}
-    </script>
-</div>
+    });
+
+    document.getElementById('finalize-draft-btn').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Finalize Draft',
+            text: 'Are you sure you want to auto-complete this draft?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ff4500',
+            cancelButtonColor: '#666',
+            confirmButtonText: 'Yes, finalize!',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/draft/finalize-auto/{{ draft.id }}/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Draft Finalized!',
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to finalize draft!'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    document.getElementById('save-draft-btn').addEventListener('click', function() {
+        fetch('/draft/save/{{ draft.id }}/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Saved!',
+                    text: 'Draft saved successfully!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to save draft!'
+                });
+            }
+        });
+    });
+    {% else %}
+    document.getElementById('edit-draft-btn').addEventListener('click', function() {
+        fetch('/draft/edit/{{ draft.id }}/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to edit draft!'
+                });
+            }
+        });
+    });
+    {% endif %}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

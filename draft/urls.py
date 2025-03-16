@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import customize_draft, create_draft, drafts_list, delete_draft, add_wrestler_to_brand, auto_pick_wrestler, \
-    save_draft, edit_draft, finalize_draft_auto
+    save_draft, edit_draft, finalize_draft_auto, remove_wrestler_from_brand
 
 app_name = 'draft'
 
@@ -14,5 +14,6 @@ urlpatterns = [
     path('edit/<int:draft_id>/', edit_draft, name='edit_draft'),
     path('list/', drafts_list, name='list_drafts'),
     path('delete/<int:draft_id>/', delete_draft, name='delete_draft'),
+path('remove-wrestler/<int:draft_id>/', remove_wrestler_from_brand, name='remove_wrestler'),
 
 ]
